@@ -45,20 +45,12 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label text-muted fw-medium">Recall Date</label>
+                    <label class="form-label text-muted fw-medium">Expiry Date</label>
                     <input type="date" name="recall_date" class="form-control bg-light border-0" value="{{ old('recall_date') }}">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label text-muted fw-medium">Doctor Name</label>
+                <div class="col-md-12">
+                    <label class="form-label text-muted fw-medium">Optometrist / Practice Name</label>
                     <input type="text" name="doctor_name" class="form-control bg-light border-0" value="{{ old('doctor_name') }}">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label text-muted fw-medium">Eye <span class="text-danger">*</span></label>
-                    <select name="eye_side" class="form-select bg-light border-0" required>
-                        <option value="Both" {{ old('eye_side') == 'Both' ? 'selected' : '' }}>Both Eyes</option>
-                        <option value="R" {{ old('eye_side') == 'R' ? 'selected' : '' }}>Right (OD)</option>
-                        <option value="L" {{ old('eye_side') == 'L' ? 'selected' : '' }}>Left (OS)</option>
-                    </select>
                 </div>
             </div>
 
@@ -67,22 +59,39 @@
                 <table class="table table-bordered align-middle">
                     <thead class="table-light text-center">
                         <tr>
+                            <th>Eye</th>
                             <th>SPH</th>
                             <th>CYL</th>
                             <th>AXIS</th>
                             <th>PRISM (H)</th>
                             <th>PRISM (V)</th>
                             <th>ADD</th>
+                            <th>PD</th>
+                            <th>FH</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><input type="text" name="sphere" class="form-control text-center bg-light border-0" value="{{ old('sphere') }}"></td>
-                            <td><input type="text" name="cylinder" class="form-control text-center bg-light border-0" value="{{ old('cylinder') }}"></td>
-                            <td><input type="text" name="axis" class="form-control text-center bg-light border-0" value="{{ old('axis') }}"></td>
-                            <td><input type="text" name="h_prism" class="form-control text-center bg-light border-0" value="{{ old('h_prism') }}"></td>
-                            <td><input type="text" name="v_prism" class="form-control text-center bg-light border-0" value="{{ old('v_prism') }}"></td>
-                            <td><input type="text" name="add" class="form-control text-center bg-light border-0" value="{{ old('add') }}"></td>
+                            <td class="fw-bold align-middle">Right (OD)</td>
+                            <td><input type="text" name="od_sphere" class="form-control text-center bg-light border-0" value="{{ old('od_sphere') }}"></td>
+                            <td><input type="text" name="od_cylinder" class="form-control text-center bg-light border-0" value="{{ old('od_cylinder') }}"></td>
+                            <td><input type="text" name="od_axis" class="form-control text-center bg-light border-0" value="{{ old('od_axis') }}"></td>
+                            <td><input type="text" name="od_h_prism" class="form-control text-center bg-light border-0" value="{{ old('od_h_prism') }}"></td>
+                            <td><input type="text" name="od_v_prism" class="form-control text-center bg-light border-0" value="{{ old('od_v_prism') }}"></td>
+                            <td><input type="text" name="od_add" class="form-control text-center bg-light border-0" value="{{ old('od_add') }}"></td>
+                            <td><input type="text" name="od_pd" class="form-control text-center bg-light border-0" value="{{ old('od_pd') }}"></td>
+                            <td><input type="text" name="od_fh" class="form-control text-center bg-light border-0" value="{{ old('od_fh') }}"></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold align-middle">Left (OS)</td>
+                            <td><input type="text" name="os_sphere" class="form-control text-center bg-light border-0" value="{{ old('os_sphere') }}"></td>
+                            <td><input type="text" name="os_cylinder" class="form-control text-center bg-light border-0" value="{{ old('os_cylinder') }}"></td>
+                            <td><input type="text" name="os_axis" class="form-control text-center bg-light border-0" value="{{ old('os_axis') }}"></td>
+                            <td><input type="text" name="os_h_prism" class="form-control text-center bg-light border-0" value="{{ old('os_h_prism') }}"></td>
+                            <td><input type="text" name="os_v_prism" class="form-control text-center bg-light border-0" value="{{ old('os_v_prism') }}"></td>
+                            <td><input type="text" name="os_add" class="form-control text-center bg-light border-0" value="{{ old('os_add') }}"></td>
+                            <td><input type="text" name="os_pd" class="form-control text-center bg-light border-0" value="{{ old('os_pd') }}"></td>
+                            <td><input type="text" name="os_fh" class="form-control text-center bg-light border-0" value="{{ old('os_fh') }}"></td>
                         </tr>
                     </tbody>
                 </table>

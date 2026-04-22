@@ -20,9 +20,11 @@ class SearchController extends Controller
 
         $customers = Customer::where('first_name', 'like', "%{$query}%")
             ->orWhere('last_name', 'like', "%{$query}%")
+            ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$query}%"])
             ->orWhere('email', 'like', "%{$query}%")
-            ->orWhere('phone', 'like', "%{$query}%")
+            ->orWhere('phone_number', 'like', "%{$query}%")
             ->orWhere('customer_number', 'like', "%{$query}%")
+            ->orWhere('date_of_birth', 'like', "%{$query}%")
             ->get();
 
         $orders = Order::where('order_number', 'like', "%{$query}%")->get();

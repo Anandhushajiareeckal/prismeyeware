@@ -16,7 +16,7 @@
                         <th>Customer</th>
                         <th>Type</th>
                         <th>Doctor</th>
-                        <th>Recall Date</th>
+                        <th>Expiry Date</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>

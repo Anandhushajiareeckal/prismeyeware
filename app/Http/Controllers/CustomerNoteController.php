@@ -29,7 +29,10 @@ class CustomerNoteController extends Controller
      */
     public function store(StoreCustomerNoteRequest $request)
     {
-        //
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
+        CustomerNote::create($data);
+        return back()->with('success', 'Note added successfully.');
     }
 
     /**

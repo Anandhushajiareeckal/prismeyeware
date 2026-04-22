@@ -29,7 +29,19 @@ class CustomerDocumentController extends Controller
      */
     public function store(StoreCustomerDocumentRequest $request)
     {
-        //
+        $data = $request->validated();
+        if ($request->hasFile('document')) {
+            $file = $request->file('document');
+            $path = $file->store('customer_documents', 'public');
+            CustomerDocument::create([
+                'customer_id' => $data['customer_id'],
+                'file_path' => $path,
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientOriginalExtension(),
+                'uploaded_by' => auth()->id(),
+            ]);
+        }
+        return back()->with('success', 'Document uploaded successfully.');
     }
 
     /**

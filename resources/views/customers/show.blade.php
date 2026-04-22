@@ -79,6 +79,21 @@
                             Invoices <span class="badge bg-light text-dark ms-1">{{ $customer->invoices->count() }}</span>
                         </button>
                     </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-medium text-secondary" data-bs-toggle="tab" data-bs-target="#cust-comms">
+                            Comments
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-medium text-secondary" data-bs-toggle="tab" data-bs-target="#cust-notes">
+                            Notes <span class="badge bg-light text-dark ms-1">{{ $customer->notes->count() }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-medium text-secondary" data-bs-toggle="tab" data-bs-target="#cust-docs">
+                            Docs <span class="badge bg-light text-dark ms-1">{{ $customer->documents->count() }}</span>
+                        </button>
+                    </li>
                 </ul>
                 <hr class="mt-0 text-muted opacity-25">
             </div>
@@ -96,27 +111,23 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Date</th>
-                                        <th>Eye</th>
-                                        <th>SPH</th>
-                                        <th>CYL</th>
-                                        <th>AXIS</th>
-                                        <th>ADD</th>
-                                        <th>Rec. Date</th>
+                                        <th>Type</th>
+                                        <th>Optometrist</th>
+                                        <th>Exp. Date</th>
+                                        <th class="text-end">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($customer->prescriptions->sortByDesc('prescription_date') as $rx)
                                     <tr>
                                         <td><a href="{{ route('prescriptions.show', $rx) }}" class="fw-medium text-primary">{{ \Carbon\Carbon::parse($rx->prescription_date)->format('M d, Y') }}</a></td>
-                                        <td class="fw-bold">{{ $rx->eye_side }}</td>
-                                        <td>{{ $rx->sphere ?: '-' }}</td>
-                                        <td>{{ $rx->cylinder ?: '-' }}</td>
-                                        <td>{{ $rx->axis ?: '-' }}</td>
-                                        <td>{{ $rx->add ?: '-' }}</td>
+                                        <td><span class="badge bg-light text-dark border">{{ $rx->type }}</span></td>
+                                        <td>{{ $rx->doctor_name ?? '-' }}</td>
                                         <td class="text-muted">{{ $rx->recall_date ? \Carbon\Carbon::parse($rx->recall_date)->format('M d, Y') : '-' }}</td>
+                                        <td class="text-end"><a href="{{ route('prescriptions.show', $rx) }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i> View Rx</a></td>
                                     </tr>
                                     @empty
-                                    <tr><td colspan="7" class="text-center py-4 text-muted">No prescriptions on record.</td></tr>
+                                    <tr><td colspan="5" class="text-center py-4 text-muted">No prescriptions on record.</td></tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -219,6 +230,96 @@
                                     </tr>
                                     @empty
                                     <tr><td colspan="5" class="text-center py-4 text-muted">No invoices found.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Cust Comms Tab -->
+                    <div class="tab-pane fade" id="cust-comms">
+                        <form action="{{ route('customers.updateComments', $customer) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-medium">Customer Comments</label>
+                                <textarea name="cust_comms" class="form-control bg-light border-0" rows="8" placeholder="Enter comments here...">{{ $customer->cust_comms }}</textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">Save Comments</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Notes Tab -->
+                    <div class="tab-pane fade" id="cust-notes">
+                        <form action="{{ route('customer-notes.store') }}" method="POST" class="mb-4">
+                            @csrf
+                            <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-medium">Add New Note</label>
+                                <textarea name="note" class="form-control bg-light border-0" rows="3" required></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary shadow-sm">Add Note</button>
+                            </div>
+                        </form>
+                        <div class="list-group list-group-flush border-top pt-3">
+                            @forelse($customer->notes->sortByDesc('created_at') as $note)
+                            <div class="list-group-item px-0 border-0 mb-3 bg-light rounded p-3">
+                                <p class="mb-1 text-dark" style="white-space: pre-wrap;">{{ $note->note }}</p>
+                                <small class="text-muted"><i class="bi bi-person"></i> {{ $note->user->name ?? 'System' }} &bull; {{ $note->created_at->format('M d, Y h:i A') }}</small>
+                            </div>
+                            @empty
+                            <p class="text-muted text-center py-3">No notes yet.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Docs Tab -->
+                    <div class="tab-pane fade" id="cust-docs">
+                        <form action="{{ route('customer-documents.store') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                            @csrf
+                            <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-8">
+                                    <input type="file" name="document" class="form-control bg-light border-0" required accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button type="submit" class="btn btn-primary w-100 shadow-sm">Upload File</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Uploaded By</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($customer->documents->sortByDesc('created_at') as $doc)
+                                    <tr>
+                                        <td>
+                                            @if($doc->file_path)
+                                                <a href="{{ Storage::url($doc->file_path) }}" target="_blank" class="fw-medium text-dark"><i class="bi bi-file-earmark-text me-2"></i>{{ $doc->file_name ?? 'Document' }}</a>
+                                            @else
+                                                <span class="fw-medium text-dark"><i class="bi bi-file-earmark-text me-2"></i>{{ $doc->file_name ?? 'Document' }}</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $doc->uploader->name ?? '-' }}</td>
+                                        <td>{{ $doc->created_at->format('M d, Y') }}</td>
+                                        <td class="text-end">
+                                            @if($doc->file_path)
+                                            <a href="{{ Storage::url($doc->file_path) }}" target="_blank" class="btn btn-sm btn-light"><i class="bi bi-download"></i></a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr><td colspan="4" class="text-center py-4 text-muted">No documents uploaded.</td></tr>
                                     @endforelse
                                 </tbody>
                             </table>

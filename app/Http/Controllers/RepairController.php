@@ -37,10 +37,32 @@ class RepairController extends Controller
     public function store(StoreRepairRequest $request)
     {
         $data = $request->validated();
-        $data['repair_number'] = 'REP-' . strtoupper(substr(uniqid(), -6));
+        $latestRepair = \App\Models\Repair::orderBy('id', 'desc')->first();
+        
+        $nextRepairId = 100;
+        if ($latestRepair && is_numeric($latestRepair->repair_number)) {
+            $nextRepairId = max(100, intval($latestRepair->repair_number) + 1);
+        } else {
+            $nextRepairId = max(100, (\App\Models\Repair::max('id') ?? 0) + 1);
+        }
+        
+        $data['repair_number'] = sprintf('%05d', $nextRepairId);
         $data['created_by'] = auth()->id();
+        
+        $repair_price = 0;
+        foreach($data['items'] as $item) {
+            $repair_price += ($item['price'] ?? 0);
+        }
+        $data['repair_price'] = $repair_price;
 
         $repair = Repair::create($data);
+        $repair->items()->createMany($data['items']);
+
+        foreach($data['items'] as $item) {
+            if (!empty($item['repair_type'])) {
+                \App\Models\RepairType::firstOrCreate(['name' => trim($item['repair_type'])]);
+            }
+        }
 
         return redirect()->route('repairs.show', $repair)->with('success', 'Repair job created successfully.');
     }
@@ -58,7 +80,25 @@ class RepairController extends Controller
 
     public function update(UpdateRepairRequest $request, Repair $repair)
     {
-        $repair->update($request->validated());
+        $data = $request->validated();
+        
+        $repair_price = 0;
+        foreach($data['items'] as $item) {
+            $repair_price += ($item['price'] ?? 0);
+        }
+        $data['repair_price'] = $repair_price;
+
+        $repair->update($data);
+        
+        $repair->items()->delete();
+        $repair->items()->createMany($data['items']);
+        
+        foreach($data['items'] as $item) {
+            if (!empty($item['repair_type'])) {
+                \App\Models\RepairType::firstOrCreate(['name' => trim($item['repair_type'])]);
+            }
+        }
+        
         return redirect()->route('repairs.show', $repair)->with('success', 'Repair job updated successfully.');
     }
 

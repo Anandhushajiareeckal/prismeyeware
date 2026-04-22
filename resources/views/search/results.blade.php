@@ -17,7 +17,7 @@
                     <a href="{{ route('customers.show', $customer) }}" class="list-group-item list-group-item-action p-3 d-flex justify-content-between align-items-center">
                         <div>
                             <span class="fw-bold text-dark d-block">{{ $customer->full_name }} <span class="badge bg-light text-dark ms-2 fw-normal">{{ $customer->customer_number }}</span></span>
-                            <span class="small text-muted d-block mt-1"><i class="bi bi-envelope me-1"></i> {{ $customer->email ?: 'No email' }} &bull; <i class="bi bi-telephone me-1"></i> {{ $customer->phone ?: 'No phone' }}</span>
+                            <span class="small text-muted d-block mt-1"><i class="bi bi-envelope me-1"></i> {{ $customer->email ?: 'No email' }} &bull; <i class="bi bi-telephone me-1"></i> {{ $customer->phone_number ?: 'No phone' }} &bull; <i class="bi bi-calendar3 me-1"></i> {{ $customer->date_of_birth ? date('M d, Y', strtotime($customer->date_of_birth)) : 'No DOB' }}</span>
                         </div>
                         <i class="bi bi-chevron-right text-muted"></i>
                     </a>

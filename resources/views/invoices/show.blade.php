@@ -4,7 +4,7 @@
 <div class="mb-4 d-flex justify-content-between align-items-center">
     <div>
         <a href="{{ route('invoices.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> All Invoices</a>
-        <h3 class="page-title mt-2 mb-0">Invoice: {{ $invoice->invoice_number }}</h3>
+        <h3 class="page-title mt-2 mb-0">Tax Invoice: {{ $invoice->invoice_number }}</h3>
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('invoices.print.a4', $invoice) }}" target="_blank" class="btn btn-outline-primary"><i class="bi bi-printer"></i> Print A4</a>

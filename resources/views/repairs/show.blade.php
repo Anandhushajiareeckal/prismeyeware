@@ -64,18 +64,42 @@
             </div>
             <div class="card-body p-4">
                 <div class="row mb-4">
-                    <div class="col-sm-6">
-                        <span class="text-muted fw-bold">Type of Repair</span>
-                        <p class="fs-5 fw-medium text-dark mb-0">{{ $repair->repair_type ?: 'Not specified' }}</p>
-                    </div>
-                    <div class="col-sm-6">
+                    <div class="col-12">
                         <span class="text-muted fw-bold">Item / SKU</span>
                         <p class="fs-5 fw-medium text-dark mb-0">{{ $repair->sku ?: 'Not specified' }}</p>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <span class="text-muted fw-bold">Estimated Cost</span>
-                    <p class="fs-5 fw-medium text-success mb-0">${{ number_format($repair->repair_price, 2) }}</p>
+                
+                <h6 class="text-muted fw-bold mb-3 mt-2">Repair Features</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-muted text-uppercase small">Repair Type</th>
+                                <th class="text-end text-muted text-uppercase small">Amount ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($repair->items && $repair->items->count() > 0)
+                                @foreach($repair->items as $item)
+                                <tr>
+                                    <td class="fw-medium text-dark">{{ $item->repair_type }}</td>
+                                    <td class="text-end fw-medium text-success">${{ number_format($item->price, 2) }}</td>
+                                </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted py-3">No repair types defined.</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-light border-top">
+                                <td class="text-end fw-bold text-dark pt-3 pb-3">Total Estimated Cost:</td>
+                                <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3">${{ number_format($repair->repair_price, 2) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
                 <div class="mb-0 border-top pt-4">
                     <span class="text-muted fw-bold d-block mb-2">Description & Notes</span>

@@ -12,7 +12,7 @@ class StoreCustomerDocumentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,8 @@ class StoreCustomerDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'customer_id' => 'required|exists:customers,id',
+            'document' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
         ];
     }
 }

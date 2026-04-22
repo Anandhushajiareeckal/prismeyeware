@@ -37,7 +37,7 @@
                 <p class="text-secondary mb-0">Phone: (555) 123-4567 | hello@prismeyewear.com</p>
             </div>
             <div class="company-details">
-                <div class="invoice-title">INVOICE</div>
+                <div class="invoice-title">TAX INVOICE</div>
                 <p class="mb-0 fw-bold fs-5 text-dark">#{{ $invoice->invoice_number }}</p>
                 <p class="text-secondary mb-0">Date: {{ \Carbon\Carbon::parse($invoice->invoice_date)->format('F d, Y') }}</p>
                 <p class="text-secondary mb-0">Status: <strong class="text-{{ $invoice->payment_status === 'Paid' ? 'success' : 'danger' }}">{{ strtoupper($invoice->payment_status) }}</strong></p>

@@ -36,15 +36,11 @@
                     <span class="badge bg-light text-dark border">{{ $prescription->type }}</span>
                 </div>
                 <div class="mb-3">
-                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Eye Spec</span><br>
-                    <span class="fw-medium text-dark">{{ $prescription->eye_side == 'R' ? 'Right (OD)' : ($prescription->eye_side == 'L' ? 'Left (OS)' : 'Both Eyes') }}</span>
-                </div>
-                <div class="mb-3">
-                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Doctor / Optometrist</span><br>
+                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Optometrist / Practice Name</span><br>
                     <span class="fw-medium text-dark">{{ $prescription->doctor_name ?? 'Not specified' }}</span>
                 </div>
                 <div class="mb-0">
-                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Recall Date</span><br>
+                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Expiry Date</span><br>
                     <span class="fw-medium{{ $prescription->recall_date && \Carbon\Carbon::parse($prescription->recall_date)->isPast() ? ' text-danger' : ' text-dark' }}">{{ $prescription->recall_date ? \Carbon\Carbon::parse($prescription->recall_date)->format('M d, Y') : 'None set' }}</span>
                 </div>
             </div>
@@ -61,22 +57,39 @@
                     <table class="table table-bordered align-middle text-center mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th class="text-muted small fw-bold tracking-wide border-bottom-0">Eye</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">SPH</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">CYL</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">AXIS</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">PRISM (H)</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">PRISM (V)</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">ADD</th>
+                                <th class="text-muted small fw-bold tracking-wide border-bottom-0">PD</th>
+                                <th class="text-muted small fw-bold tracking-wide border-bottom-0">FH</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="fs-4 fw-medium text-dark py-3">{{ $prescription->sphere ?: '-' }}</td>
-                                <td class="fs-4 fw-medium text-dark py-3">{{ $prescription->cylinder ?: '-' }}</td>
-                                <td class="fs-4 fw-medium text-dark py-3">{{ $prescription->axis ?: '-' }}</td>
-                                <td class="fs-4 fw-medium text-dark py-3">{{ $prescription->h_prism ?: '-' }}</td>
-                                <td class="fs-4 fw-medium text-dark py-3">{{ $prescription->v_prism ?: '-' }}</td>
-                                <td class="fs-4 fw-medium text-dark py-3">{{ $prescription->add ?: '-' }}</td>
+                                <td class="fw-bold fs-6 text-dark py-3 align-middle bg-light">Right (OD)</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_sphere ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_cylinder ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_axis ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_h_prism ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_v_prism ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_add ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_pd ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_fh ?: '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold fs-6 text-dark py-3 align-middle bg-light">Left (OS)</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_sphere ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_cylinder ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_axis ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_h_prism ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_v_prism ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_add ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_pd ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_fh ?: '-' }}</td>
                             </tr>
                         </tbody>
                     </table>

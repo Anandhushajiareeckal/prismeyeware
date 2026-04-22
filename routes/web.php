@@ -6,6 +6,8 @@ use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\RepairController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\CustomerNoteController;
+use App\Http\Controllers\CustomerDocumentController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -26,6 +28,7 @@ Route::get('/dashboard', function () {
     return view('dashboard', compact('metrics', 'recentOrders'));
 })->name('dashboard');
 
+Route::put('customers/{customer}/comments', [CustomerController::class, 'updateComments'])->name('customers.updateComments');
 Route::resource('customers', CustomerController::class);
 Route::resource('prescriptions', PrescriptionController::class);
 Route::resource('repairs', RepairController::class);
@@ -35,4 +38,8 @@ Route::get('invoices/{invoice}/print/a4', [InvoiceController::class, 'printA4'])
 Route::get('invoices/{invoice}/print/thermal', [InvoiceController::class, 'printThermal'])->name('invoices.print.thermal');
 Route::resource('invoices', InvoiceController::class);
 
+Route::post('customer-notes', [CustomerNoteController::class, 'store'])->name('customer-notes.store');
+Route::post('customer-documents', [CustomerDocumentController::class, 'store'])->name('customer-documents.store');
+
 Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
+Route::resource('repair-types', \App\Http\Controllers\RepairTypeController::class)->only(['index', 'store', 'destroy']);

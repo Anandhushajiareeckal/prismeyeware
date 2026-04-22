@@ -63,7 +63,10 @@ class InvoiceController extends Controller
         $totalDiscount = 0;
         
         foreach ($data['items'] as &$item) {
-            $itemTotal = ($item['rate'] * $item['quantity']) - ($item['discount'] ?? 0) + ($item['tax'] ?? 0);
+            $itemSubtotal = $item['rate'] * $item['quantity'];
+            $item['tax'] = ($itemSubtotal - ($item['discount'] ?? 0)) * 0.15;
+            
+            $itemTotal = $itemSubtotal - ($item['discount'] ?? 0) + $item['tax'];
             $item['total'] = $itemTotal;
 
             $subtotal += ($item['rate'] * $item['quantity']);
@@ -121,7 +124,10 @@ class InvoiceController extends Controller
         $invoice->items()->delete();
 
         foreach ($data['items'] as &$item) {
-            $itemTotal = ($item['rate'] * $item['quantity']) - ($item['discount'] ?? 0) + ($item['tax'] ?? 0);
+            $itemSubtotal = $item['rate'] * $item['quantity'];
+            $item['tax'] = ($itemSubtotal - ($item['discount'] ?? 0)) * 0.15;
+            
+            $itemTotal = $itemSubtotal - ($item['discount'] ?? 0) + $item['tax'];
             $item['total'] = $itemTotal;
 
             $subtotal += ($item['rate'] * $item['quantity']);

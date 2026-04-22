@@ -35,7 +35,16 @@ class CustomerController extends Controller
     public function store(StoreCustomerRequest $request)
     {
         $data = $request->validated();
-        $data['customer_number'] = 'CUST-' . strtoupper(substr(uniqid(), -6));
+        $latestCustomer = \App\Models\Customer::orderBy('id', 'desc')->first();
+        
+        $nextCustomerId = 100;
+        if ($latestCustomer && is_numeric($latestCustomer->customer_number)) {
+            $nextCustomerId = max(100, intval($latestCustomer->customer_number) + 1);
+        } else {
+            $nextCustomerId = max(100, (\App\Models\Customer::max('id') ?? 0) + 1);
+        }
+        
+        $data['customer_number'] = sprintf('%05d', $nextCustomerId);
         $data['created_by'] = auth()->id();
 
         $customer = Customer::create($data);
@@ -61,6 +70,13 @@ class CustomerController extends Controller
         $customer->update($data);
 
         return redirect()->route('customers.show', $customer)->with('success', 'Customer updated successfully.');
+    }
+
+    public function updateComments(Request $request, Customer $customer)
+    {
+        $customer->cust_comms = $request->cust_comms;
+        $customer->save();
+        return redirect()->back()->with('success', 'Comments updated successfully.');
     }
 
     public function destroy(Customer $customer)

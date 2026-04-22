@@ -33,7 +33,7 @@
         <!-- Sidebar -->
         <div class="sidebar p-3 d-none d-md-block" style="width: 260px;">
             <div class="d-flex align-items-center mb-4 mt-2 px-2">
-                <img src="{{ asset('assets/img/logo/logo.jpg') }}" alt="Prism Eyewear" style="height: 40px; width: auto;">
+                <img src="{{ asset('assets/img/logo/logo.jpg') }}" alt="Prism Eyewear" style="height: 100px !important; width: auto;">
             </div>
             <ul class="list-unstyled">
                 <li><a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
@@ -45,6 +45,9 @@
                 <li><a href="{{ route('orders.index') }}" class="sidebar-link {{ request()->routeIs('orders.*') ? 'active' : '' }}"><i class="bi bi-bag"></i> Orders</a></li>
                 <li class="mt-4 mb-2 px-3 text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 600;">Finance</li>
                 <li><a href="{{ route('invoices.index') }}" class="sidebar-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}"><i class="bi bi-receipt"></i> Billing & Invoices</a></li>
+                
+                <li class="nav-title mt-4 mb-2 small text-muted fw-bold text-uppercase px-2 tracking-wide">Settings</li>
+                <li><a href="{{ route('repair-types.index') }}" class="sidebar-link {{ request()->routeIs('repair-types.*') ? 'active' : '' }}"><i class="bi bi-tools"></i> Repair Types</a></li>
             </ul>
         </div>
 

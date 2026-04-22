@@ -81,7 +81,7 @@
                             <td><input type="number" name="items[0][quantity]" class="form-control bg-light border-0 text-center qty fw-medium" value="1" min="1" required></td>
                             <td><input type="number" step="0.01" name="items[0][rate]" class="form-control bg-light border-0 text-end rate fw-medium" value="0.00" min="0" required></td>
                             <td><input type="number" step="0.01" name="items[0][discount]" class="form-control bg-light border-0 text-end discount fw-medium text-danger" value="0.00" min="0"></td>
-                            <td><input type="number" step="0.01" name="items[0][tax]" class="form-control bg-light border-0 text-end tax fw-medium" value="0.00" min="0"></td>
+                            <td><input type="number" step="0.01" name="items[0][tax]" class="form-control bg-light text-muted border-0 text-end tax fw-medium" value="0.00" min="0" readonly></td>
                             <td class="text-end fw-bold line-total p-3 text-dark">0.00</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" disabled><i class="bi bi-x-lg"></i></button>
@@ -143,9 +143,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const qty = parseFloat(row.querySelector('.qty').value) || 0;
             const rate = parseFloat(row.querySelector('.rate').value) || 0;
             const discount = parseFloat(row.querySelector('.discount').value) || 0;
-            const tax = parseFloat(row.querySelector('.tax').value) || 0;
             
             const lineSubtotal = qty * rate;
+            const tax = (lineSubtotal - discount) * 0.15;
+            
+            row.querySelector('.tax').value = tax.toFixed(2);
             const lineTotal = lineSubtotal - discount + tax;
             
             row.querySelector('.line-total').textContent = lineTotal.toFixed(2);
@@ -179,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control bg-light border-0 text-center qty fw-medium" value="1" min="1" required></td>
             <td><input type="number" step="0.01" name="items[${itemIndex}][rate]" class="form-control bg-light border-0 text-end rate fw-medium" value="0.00" min="0" required></td>
             <td><input type="number" step="0.01" name="items[${itemIndex}][discount]" class="form-control bg-light border-0 text-end discount fw-medium text-danger" value="0.00" min="0"></td>
-            <td><input type="number" step="0.01" name="items[${itemIndex}][tax]" class="form-control bg-light border-0 text-end tax fw-medium" value="0.00" min="0"></td>
+            <td><input type="number" step="0.01" name="items[${itemIndex}][tax]" class="form-control bg-light text-muted border-0 text-end tax fw-medium" value="0.00" min="0" readonly></td>
             <td class="text-end fw-bold line-total p-3 text-dark">0.00</td>
             <td class="text-center">
                 <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle"><i class="bi bi-x-lg"></i></button>

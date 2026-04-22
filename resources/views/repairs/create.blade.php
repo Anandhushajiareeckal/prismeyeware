@@ -48,11 +48,7 @@
                 </div>
             </div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label fw-medium text-muted">Repair Type</label>
-                    <input type="text" name="repair_type" class="form-control bg-light border-0" placeholder="e.g. Frame adjustment, nose pad replacement" value="{{ old('repair_type') }}">
-                </div>
+            <div class="row g-3 mb-4 border-top pt-3">
                 <div class="col-md-6">
                     <label class="form-label fw-medium text-muted">Item / SKU</label>
                     <input type="text" name="sku" class="form-control bg-light border-0" placeholder="Product name or SKU being repaired" value="{{ old('sku') }}">
@@ -61,10 +57,46 @@
                     <label class="form-label fw-medium text-muted">Assigned Staff</label>
                     <input type="text" name="assigned_staff" class="form-control bg-light border-0" value="{{ old('assigned_staff') }}">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-medium text-muted">Estimated Price ($)</label>
-                    <input type="number" step="0.01" name="repair_price" class="form-control bg-light border-0" value="{{ old('repair_price') }}">
-                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 pt-2">
+                <h5 class="mb-0 fw-semibold text-primary">Repair Types</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" id="addItemBtn"><i class="bi bi-plus-lg"></i> Add Repair Type</button>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle" id="itemsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 70%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0">Repair Type / Name <span class="text-danger">*</span></th>
+                            <th style="width: 25%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0 text-end">Estimated Cost ($)<span class="text-danger">*</span></th>
+                            <th style="width: 5%" class="border-bottom-0"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <tr class="item-row">
+                            <td>
+                                <select name="items[0][repair_type]" class="form-select bg-light border-0 repair-type" required>
+                                    <option value="">— Select Repair Type —</option>
+                                    @foreach(\App\Models\RepairType::where('status','Active')->orderBy('name')->get() as $type)
+                                        <option value="{{ $type->name }}">{{ $type->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td><input type="number" step="0.01" name="items[0][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0" required></td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" disabled><i class="bi bi-x-lg"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="text-end fw-bold pt-3 pb-3">Subtotal Estimated Cost:</td>
+                            <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3" id="repairTotal">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
 
             <div class="mb-4">
@@ -79,4 +111,64 @@
         </form>
     </div>
 </div>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let itemIndex = 1;
+    const itemsBody = document.getElementById('itemsBody');
+
+    function calculateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            subtotal += price;
+        });
+        document.getElementById('repairTotal').textContent = '$' + subtotal.toFixed(2);
+        const rows = document.querySelectorAll('.item-row');
+        rows.forEach(row => {
+            row.querySelector('.remove-item').disabled = rows.length === 1;
+        });
+    }
+
+    const repairTypeOptions = {!! json_encode(\App\Models\RepairType::where('status','Active')->orderBy('name')->pluck('name')) !!};
+
+    document.getElementById('addItemBtn').addEventListener('click', function() {
+        let opts = '<option value="">— Select Repair Type —</option>';
+        repairTypeOptions.forEach(n => { opts += `<option value="${n}">${n}</option>`; });
+        const tr = document.createElement('tr');
+        tr.className = 'item-row';
+        tr.innerHTML = `
+            <td>
+                <select name="items[${itemIndex}][repair_type]" class="form-select bg-light border-0 repair-type" required>${opts}</select>
+            </td>
+            <td><input type="number" step="0.01" name="items[${itemIndex}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0" required></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle"><i class="bi bi-x-lg"></i></button>
+            </td>
+        `;
+        itemsBody.appendChild(tr);
+        itemIndex++;
+        calculateTotals();
+    });
+
+    itemsBody.addEventListener('input', function(e) {
+        if(e.target.classList.contains('price')) {
+            calculateTotals();
+        }
+    });
+
+    itemsBody.addEventListener('click', function(e) {
+        if(e.target.closest('.remove-item')) {
+            const btn = e.target.closest('.remove-item');
+            if(!btn.disabled) {
+                btn.closest('tr').remove();
+                calculateTotals();
+            }
+        }
+    });
+
+    calculateTotals();
+});
+</script>
+@endpush
 @endsection
