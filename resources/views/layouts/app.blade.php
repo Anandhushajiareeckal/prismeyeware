@@ -66,9 +66,35 @@
                 </form>
                 <div class="d-flex align-items-center">
                     <button class="btn btn-light rounded-circle me-3"><i class="bi bi-bell"></i></button>
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: 600;">AD</div>
-                        <span class="ms-2 fw-medium d-none d-md-block">Admin User</span>
+                    <div class="dropdown">
+                        <button class="btn d-flex align-items-center gap-2 border-0 bg-transparent p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px; font-weight:600; font-size:14px; flex-shrink:0;">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                            <span class="ms-1 fw-medium d-none d-md-block text-dark" style="font-size:14px;">{{ auth()->user()->name }}</span>
+                            <i class="bi bi-chevron-down text-muted d-none d-md-block" style="font-size:11px;"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius:12px; min-width:200px;">
+                            <li class="px-3 pt-3 pb-2">
+                                <div class="fw-semibold text-dark" style="font-size:13px;">{{ auth()->user()->name }}</div>
+                                <div class="text-muted" style="font-size:12px;">{{ auth()->user()->email }}</div>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('profile.show') }}">
+                                    <i class="bi bi-person-circle text-primary"></i> My Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}" class="d-inline w-100">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger">
+                                        <i class="bi bi-box-arrow-right"></i> Sign Out
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

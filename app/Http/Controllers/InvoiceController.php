@@ -51,7 +51,8 @@ class InvoiceController extends Controller
     {
         $customer_id = $request->get('customer_id');
         $customer = $customer_id ? Customer::find($customer_id) : null;
-        return view('invoices.create', compact('customer'));
+        $repair = $request->get('repair_id') ? Repair::with('items')->find($request->get('repair_id')) : null;
+        return view('invoices.create', compact('customer', 'repair'));
     }
 
     public function store(StoreInvoiceRequest $request)
@@ -64,17 +65,17 @@ class InvoiceController extends Controller
         
         foreach ($data['items'] as &$item) {
             $itemSubtotal = $item['rate'] * $item['quantity'];
-            $item['tax'] = ($itemSubtotal - ($item['discount'] ?? 0)) * 0.15;
+            // Inclusive tax calculation: Tax = Total - (Total / 1.15)
+            $item['tax'] = ($itemSubtotal - ($item['discount'] ?? 0)) - (($itemSubtotal - ($item['discount'] ?? 0)) / 1.15);
             
-            $itemTotal = $itemSubtotal - ($item['discount'] ?? 0) + $item['tax'];
-            $item['total'] = $itemTotal;
+            $item['total'] = $itemSubtotal - ($item['discount'] ?? 0);
 
             $subtotal += ($item['rate'] * $item['quantity']);
             $totalTax += ($item['tax'] ?? 0);
             $totalDiscount += ($item['discount'] ?? 0);
         }
         
-        $totalAmount = $subtotal - $totalDiscount + $totalTax;
+        $totalAmount = $subtotal - $totalDiscount;
 
         $invoice = Invoice::create([
             'invoice_number' => 'INV-' . strtoupper(substr(uniqid(), -6)),
@@ -125,17 +126,17 @@ class InvoiceController extends Controller
 
         foreach ($data['items'] as &$item) {
             $itemSubtotal = $item['rate'] * $item['quantity'];
-            $item['tax'] = ($itemSubtotal - ($item['discount'] ?? 0)) * 0.15;
+            // Inclusive tax calculation: Tax = Total - (Total / 1.15)
+            $item['tax'] = ($itemSubtotal - ($item['discount'] ?? 0)) - (($itemSubtotal - ($item['discount'] ?? 0)) / 1.15);
             
-            $itemTotal = $itemSubtotal - ($item['discount'] ?? 0) + $item['tax'];
-            $item['total'] = $itemTotal;
+            $item['total'] = $itemSubtotal - ($item['discount'] ?? 0);
 
             $subtotal += ($item['rate'] * $item['quantity']);
             $totalTax += ($item['tax'] ?? 0);
             $totalDiscount += ($item['discount'] ?? 0);
         }
         
-        $totalAmount = $subtotal - $totalDiscount + $totalTax;
+        $totalAmount = $subtotal - $totalDiscount;
 
         $invoice->update([
             'invoice_date' => $data['invoice_date'],

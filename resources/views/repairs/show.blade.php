@@ -7,11 +7,25 @@
         <h3 class="page-title mt-2 mb-0">Repair Job: {{ $repair->repair_number }}</h3>
     </div>
     <div>
-        <a href="{{ route('repairs.edit', $repair) }}" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit</a>
+        @if($repair->invoices->count() > 0)
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-printer"></i> Print Invoice
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ route('invoices.print.a4', $repair->invoices->last()) }}" target="_blank"><i class="bi bi-file-earmark-pdf me-2"></i> A4 Invoice</a></li>
+                    <li><a class="dropdown-item" href="{{ route('invoices.print.thermal', $repair->invoices->last()) }}" target="_blank"><i class="bi bi-receipt me-2"></i> Thermal Invoice</a></li>
+                </ul>
+            </div>
+        @endif
+        <a href="{{ route('invoices.create', ['customer_id' => $repair->customer_id, 'repair_id' => $repair->id]) }}" class="btn btn-success ms-2">
+            <i class="bi bi-receipt-cutoff"></i> Generate Invoice
+        </a>
+        <a href="{{ route('repairs.edit', $repair) }}" class="btn btn-primary ms-2"><i class="bi bi-pencil"></i> Edit</a>
         <form action="{{ route('repairs.destroy', $repair) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this repair job?');">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
+            <button type="submit" class="btn btn-outline-danger ms-2"><i class="bi bi-trash"></i> Delete</button>
         </form>
     </div>
 </div>

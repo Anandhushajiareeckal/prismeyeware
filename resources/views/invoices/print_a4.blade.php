@@ -4,129 +4,451 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice {{ $invoice->invoice_number }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #333; }
-        .invoice-box { max-width: 800px; margin: auto; padding: 40px; background: #fff; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); border-radius: 0.5rem; }
-        .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
-        .company-details { text-align: right; }
-        .invoice-title { font-size: 2.5rem; font-weight: 700; color: #0d6efd; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-        .table th { background-color: #f8f9fa !important; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .totals-row td { font-weight: 600; }
-        .grand-total { font-size: 1.25rem; color: #0d6efd; font-weight: 700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #e8ecf0;
+            color: #222;
+            font-size: 13px;
+        }
+
+        .btn-print-bar {
+            text-align: center;
+            padding: 20px;
+        }
+        .btn-print-bar button, .btn-print-bar a {
+            padding: 10px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 6px;
+        }
+        .btn-print-bar button { background: #1a6cdb; color: #fff; }
+        .btn-print-bar a { background: #fff; color: #333; border: 1px solid #ccc; }
+
+        .page {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            padding: 48px 50px 50px;
+        }
+
+        /* Watermark concentric circles */
+        .watermark {
+            position: absolute;
+            top: -120px;
+            right: -120px;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            border: 60px solid rgba(26, 108, 219, 0.04);
+            box-shadow:
+                0 0 0 80px rgba(26, 108, 219, 0.035),
+                0 0 0 160px rgba(26, 108, 219, 0.025),
+                0 0 0 240px rgba(26, 108, 219, 0.015);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .watermark-bottom {
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            border: 50px solid rgba(26, 108, 219, 0.04);
+            box-shadow:
+                0 0 0 70px rgba(26, 108, 219, 0.03),
+                0 0 0 140px rgba(26, 108, 219, 0.02);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content { position: relative; z-index: 1; }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        .logo-area { display: flex; flex-direction: column; gap: 6px; }
+        .logo-icon {
+            font-size: 36px;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        /* SVG glasses logo */
+        .logo-svg { width: 56px; height: auto; margin-bottom: 4px; }
+        .company-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a2b4a;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .company-sub { font-size: 12px; color: #555; margin-top: 2px; line-height: 1.6; }
+
+        .invoice-label-area { text-align: right; }
+        .invoice-label {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a6cdb;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .inv-number {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 16px;
+        }
+        .inv-number strong { color: #222; }
+        .balance-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .balance-amount {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a2b4a;
+        }
+        .balance-amount.paid { color: #1a6cdb; }
+
+        /* DIVIDER */
+        .divider { border: none; border-top: 1px solid #dde3ed; margin: 22px 0; }
+
+        /* BILL TO + DATES ROW */
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .bill-to-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #888;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .bill-to-name { font-size: 14px; font-weight: 700; color: #1a2b4a; margin-bottom: 3px; }
+        .bill-to-detail { font-size: 12px; color: #555; line-height: 1.7; }
+
+        .dates-table { margin-left: auto; }
+        .dates-table td {
+            font-size: 12.5px;
+            padding: 3px 0 3px 24px;
+            vertical-align: top;
+            white-space: nowrap;
+        }
+        .dates-table td:first-child { color: #666; font-weight: 500; text-align: right; }
+        .dates-table td:last-child { color: #222; font-weight: 600; }
+
+        /* ITEMS TABLE */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        .items-table thead tr {
+            background: #1a6cdb;
+            color: #fff;
+        }
+        .items-table thead th {
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .items-table thead th:first-child { border-radius: 0; }
+        .items-table tbody tr { border-bottom: 1px solid #eef1f6; }
+        .items-table tbody tr:last-child { border-bottom: 2px solid #cdd5e0; }
+        .items-table tbody td {
+            padding: 11px 14px;
+            color: #333;
+            font-size: 12.5px;
+        }
+        .items-table tfoot td { padding: 8px 14px; font-size: 13px; }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        .item-num { color: #888; font-size: 11px; }
+
+        /* TOTALS */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0;
+        }
+        .totals-box {
+            width: 260px;
+            border-left: 3px solid #1a6cdb;
+            padding-left: 0;
+        }
+        .totals-box table { width: 100%; border-collapse: collapse; }
+        .totals-box table td {
+            padding: 7px 14px;
+            font-size: 12.5px;
+        }
+        .totals-box table td:first-child { color: #555; }
+        .totals-box table td:last-child { text-align: right; font-weight: 600; color: #222; }
+        .totals-box .row-discount td:last-child { color: #e03030; }
+        .totals-box .row-total {
+            background: #f0f5ff;
+            border-top: 2px solid #1a6cdb;
+        }
+        .totals-box .row-total td {
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .totals-box .row-total td:first-child { color: #1a2b4a; }
+        .totals-box .row-total td:last-child { color: #1a6cdb; }
+        .totals-box .row-balance {
+            background: #1a6cdb;
+        }
+        .totals-box .row-balance td {
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff !important;
+        }
+
+        /* BOTTOM SECTION */
+        .bottom-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 30px;
+            padding-top: 24px;
+            border-top: 1px solid #dde3ed;
+            gap: 24px;
+        }
+        .notes-area { flex: 1; }
+        .notes-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .notes-text { font-size: 12px; color: #444; line-height: 1.7; white-space: pre-wrap; }
+        .thank-you {
+            text-align: right;
+            font-size: 12px;
+            color: #888;
+            align-self: flex-end;
+        }
+        .thank-you strong { display: block; font-size: 13px; color: #1a2b4a; margin-bottom: 2px; }
+
         @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #fff; margin: 0; padding: 0; }
-            .invoice-box { box-shadow: none; border: none; max-width: 100%; padding: 0; margin: 0; }
-            .btn-print { display: none !important; }
-            @page { margin: 1cm; }
+            body { background: #fff; margin: 0; padding: 0; }
+            .btn-print-bar { display: none !important; }
+            .page {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+                margin: 0;
+                padding: 30px 40px;
+            }
+            @page { margin: 0.8cm; size: A4; }
         }
     </style>
 </head>
-<body class="py-5">
-    <div class="container mb-4 text-center btn-print">
-        <button onclick="window.print()" class="btn btn-primary btn-lg shadow-sm px-4 fw-bold">Print Invoice (A4)</button>
-        <a href="{{ url()->previous() }}" class="btn btn-light btn-lg border ms-2 px-4 shadow-sm">Back</a>
+<body>
+    <div class="btn-print-bar">
+        <button onclick="window.print()">🖨 Print Invoice</button>
+        <a href="{{ url()->previous() }}">← Back</a>
     </div>
 
-    <div class="invoice-box border">
-        <div class="invoice-header border-bottom pb-4 mb-4">
-            <div>
-                <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">PRISM EYEWEAR</h2>
-                <p class="text-secondary mb-0">123 Optical Avenue, Vision City</p>
-                <p class="text-secondary mb-0">Phone: (555) 123-4567 | hello@prismeyewear.com</p>
-            </div>
-            <div class="company-details">
-                <div class="invoice-title">TAX INVOICE</div>
-                <p class="mb-0 fw-bold fs-5 text-dark">#{{ $invoice->invoice_number }}</p>
-                <p class="text-secondary mb-0">Date: {{ \Carbon\Carbon::parse($invoice->invoice_date)->format('F d, Y') }}</p>
-                <p class="text-secondary mb-0">Status: <strong class="text-{{ $invoice->payment_status === 'Paid' ? 'success' : 'danger' }}">{{ strtoupper($invoice->payment_status) }}</strong></p>
-            </div>
-        </div>
+    <div class="page">
+        <div class="watermark"></div>
+        <div class="watermark-bottom"></div>
 
-        <div class="row mb-5">
-            <div class="col-sm-6">
-                <h6 class="text-secondary fw-bold text-uppercase tracking-wide mb-2" style="font-size: 0.85rem;">Bill To:</h6>
-                @if($invoice->customer)
-                    <h5 class="fw-bold mb-1 text-dark">{{ $invoice->customer->full_name }}</h5>
-                    @if($invoice->customer->phone) <p class="mb-0 text-secondary">Phone: {{ $invoice->customer->phone }}</p> @endif
-                    @if($invoice->customer->email) <p class="mb-0 text-secondary">Email: {{ $invoice->customer->email }}</p> @endif
-                    @if($invoice->customer->address) <p class="mb-0 text-secondary mt-1">{{ $invoice->customer->address }}</p> @endif
-                @else
-                    <h5 class="fw-bold mb-1 text-secondary">Walk-in Customer</h5>
-                @endif
-            </div>
-            <div class="col-sm-6 text-end">
-                @if($invoice->payment_mode)
-                    <h6 class="text-secondary fw-bold text-uppercase tracking-wide mb-2" style="font-size: 0.85rem;">Payment Method:</h6>
-                    <h5 class="fw-bold mb-1 text-dark">{{ $invoice->payment_mode }}</h5>
-                @endif
-                @if($invoice->order_id)
-                    <p class="mb-0 text-secondary mt-3">Ref Order: <span class="fw-bold text-dark">{{ $invoice->order->order_number ?? '#' . $invoice->order_id }}</span></p>
-                @endif
-            </div>
-        </div>
+        <div class="content">
+            <!-- HEADER -->
+            <div class="header">
+                <div class="logo-area">
+                    <img src="{{ asset('assets/img/logo/logo.jpg') }}" alt="Prism Eyewear" style="max-width: 160px; max-height: 80px; object-fit: contain; margin-bottom: 8px;">
+                    <div class="company-sub">
+                        GST No: 138-002-128<br>
+                        Address: 6/100 Queens Road<br>
+                        Panmure Auckland 1072<br>
+                        New Zealand
+                    </div>
+                </div>
 
-        <table class="table table-bordered border-secondary mb-5">
-            <thead>
-                <tr>
-                    <th class="w-50 bg-light text-secondary">Item Description</th>
-                    <th class="text-center bg-light text-secondary">Qty</th>
-                    <th class="text-end bg-light text-secondary">Rate</th>
-                    <th class="text-end bg-light text-secondary">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($invoice->items as $item)
-                <tr>
-                    <td class="py-3">
-                        <span class="fw-bold text-dark">{{ $item->item_name }}</span>
-                        @if($item->sku) <br><small class="text-secondary">SKU: {{ $item->sku }}</small> @endif
-                    </td>
-                    <td class="text-center py-3 fw-medium">{{ $item->quantity }}</td>
-                    <td class="text-end py-3 fw-medium">${{ number_format($item->rate, 2) }}</td>
-                    <td class="text-end py-3 fw-bold text-dark">${{ number_format($item->quantity * $item->rate, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div class="row pt-2">
-            <div class="col-6">
-                @if($invoice->notes)
-                <h6 class="text-secondary fw-bold text-uppercase tracking-wide mb-2" style="font-size: 0.85rem;">Notes & Terms:</h6>
-                <div class="bg-light p-3 border rounded text-secondary small" style="white-space: pre-wrap;">{{ $invoice->notes }}</div>
-                @endif
+                <div class="invoice-label-area">
+                    <div class="invoice-label">Tax Invoice</div>
+                    <div class="inv-number"># Tax Inv-{{ $invoice->invoice_number }}</div>
+                    <div class="balance-label">Balance Due</div>
+                    @php
+                        $balanceDue = $invoice->payment_status === 'Paid' ? 0 : floatval($invoice->total_amount);
+                        $isPaid = $invoice->payment_status === 'Paid';
+                    @endphp
+                    <div class="balance-amount {{ $isPaid ? 'paid' : '' }}">
+                        NZD{{ number_format($balanceDue, 2) }}
+                    </div>
+                </div>
             </div>
-            <div class="col-6">
-                <table class="table table-borderless table-sm text-end mb-0">
-                    <tr>
-                        <td class="text-secondary w-75 py-2">Subtotal:</td>
-                        <td class="fw-bold py-2">${{ number_format($invoice->subtotal, 2) }}</td>
-                    </tr>
-                    @if($invoice->discount_amount > 0)
-                    <tr>
-                        <td class="text-danger py-2">Discount:</td>
-                        <td class="text-danger fw-bold py-2">-${{ number_format($invoice->discount_amount, 2) }}</td>
-                    </tr>
+
+            <hr class="divider">
+
+            <!-- BILL TO + DATES -->
+            <div class="meta-row">
+                <div>
+                    <div class="bill-to-label">Bill To</div>
+                    @if($invoice->customer)
+                        <div class="bill-to-name">{{ $invoice->customer->customer_number ?? $invoice->customer->full_name }}</div>
+                        <div class="bill-to-detail">
+                            {{ $invoice->customer->full_name }}<br>
+                            @if($invoice->customer->address){{ $invoice->customer->address }}<br>@endif
+                            @if($invoice->customer->phone)Phone: {{ $invoice->customer->phone }}<br>@endif
+                            @if($invoice->customer->email){{ $invoice->customer->email }}@endif
+                        </div>
+                    @else
+                        <div class="bill-to-name">Walk-in Customer</div>
                     @endif
-                    @if($invoice->tax_amount > 0)
-                    <tr>
-                        <td class="text-secondary py-2">Tax:</td>
-                        <td class="fw-bold py-2">+${{ number_format($invoice->tax_amount, 2) }}</td>
-                    </tr>
-                    @endif
-                    <tr class="border-top border-secondary">
-                        <td class="pt-3 pb-0 grand-total text-dark">Total Due:</td>
-                        <td class="pt-3 pb-0 grand-total text-primary">${{ number_format($invoice->total_amount, 2) }}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+                </div>
 
-        <div class="mt-5 pt-4 border-top border-secondary text-center text-secondary small">
-            <p class="mb-1 fw-bold text-dark">Thank you for choosing Prism Eyewear!</p>
-            <p class="mb-0">All eyewear comes with a 1-year warranty on manufacturing defects. Please retain this invoice for your records.</p>
+                <div>
+                    <table class="dates-table">
+                        <tr>
+                            <td>Invoice Date :</td>
+                            <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Terms :</td>
+                            <td>Due end of the month</td>
+                        </tr>
+                        <tr>
+                            <td>Due Date :</td>
+                            <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->endOfMonth()->format('d M Y') }}</td>
+                        </tr>
+                        @if($invoice->payment_mode)
+                        <tr>
+                            <td>Payment Mode :</td>
+                            <td>{{ $invoice->payment_mode }}</td>
+                        </tr>
+                        @endif
+                        @if($invoice->repair_id)
+                        <tr>
+                            <td>Ref Repair :</td>
+                            <td>#{{ $invoice->repair?->repair_number ?? $invoice->repair_id }}</td>
+                        </tr>
+                        @endif
+                        @if($invoice->order_id)
+                        <tr>
+                            <td>Ref Order :</td>
+                            <td>{{ $invoice->order?->order_number ?? '#' . $invoice->order_id }}</td>
+                        </tr>
+                        @endif
+                    </table>
+                </div>
+            </div>
+
+            <!-- ITEMS TABLE -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width:5%">#</th>
+                        <th style="width:45%">Item &amp; Description</th>
+                        <th class="text-center" style="width:12%">Qty</th>
+                        <th class="text-right" style="width:18%">Rate</th>
+                        <th class="text-right" style="width:20%">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($invoice->items as $index => $item)
+                    <tr>
+                        <td class="item-num">{{ $index + 1 }}</td>
+                        <td>
+                            <span style="font-weight:600; color:#1a2b4a;">{{ $item->item_name }}</span>
+                            @if($item->sku)<br><small style="color:#999;">SKU: {{ $item->sku }}</small>@endif
+                        </td>
+                        <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
+                        <td class="text-right">{{ number_format($item->rate, 2) }}</td>
+                        <td class="text-right" style="font-weight:600;">{{ number_format($item->quantity * $item->rate, 2) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <!-- TOTALS + NOTES -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:6px; gap:20px;">
+                <div style="flex:1;"></div>
+                <div class="totals-box">
+                    <table>
+                        <tr>
+                            <td>Sub Total</td>
+                            <td>{{ number_format($invoice->subtotal, 2) }}</td>
+                        </tr>
+                        @if($invoice->discount_amount > 0)
+                        <tr class="row-discount">
+                            <td>Discount</td>
+                            <td>(-) {{ number_format($invoice->discount_amount, 2) }}</td>
+                        </tr>
+                        @endif
+                        @if($invoice->tax_amount > 0)
+                        <tr>
+                            <td>GST (Incl. 15%)</td>
+                            <td>{{ number_format($invoice->tax_amount, 2) }}</td>
+                        </tr>
+                        @endif
+                        <tr class="row-total">
+                            <td>Total</td>
+                            <td>NZD{{ number_format($invoice->total_amount, 2) }}</td>
+                        </tr>
+                        @if($isPaid)
+                        <tr class="row-discount">
+                            <td>Payment Made</td>
+                            <td>(-) {{ number_format($invoice->total_amount, 2) }}</td>
+                        </tr>
+                        @endif
+                        <tr class="row-balance">
+                            <td>Balance Due</td>
+                            <td>NZD{{ number_format($balanceDue, 2) }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- NOTES + FOOTER -->
+            <div class="bottom-section">
+                <div class="notes-area">
+                    <div class="notes-label">Notes</div>
+                    <div class="notes-text">
+                        @if($invoice->notes){{ $invoice->notes }}@else Prism Eyewear Repairs And Services
+Bank: ASB
+A/C No: 12-3297-0403694-00
+
+Thanks for your business.@endif
+                    </div>
+                </div>
+                <div class="thank-you">
+                    <strong>Thank you for your business!</strong>
+                    Please retain this invoice for your records.
+                </div>
+            </div>
         </div>
     </div>
 </body>

@@ -127,8 +127,8 @@
             @endif
             @if($taxAmount > 0)
             <tr>
-                <td colspan="2" class="text-right">Tax (15%):</td>
-                <td class="text-right">+${{ number_format($taxAmount, 2) }}</td>
+                <td colspan="2" class="text-right">Tax (Incl. 15%):</td>
+                <td class="text-right">${{ number_format($taxAmount, 2) }}</td>
             </tr>
             @endif
             <tr>

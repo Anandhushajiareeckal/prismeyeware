@@ -2,9 +2,19 @@
 
 @section('content')
 <div class="mb-4">
-    <a href="{{ route('invoices.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Invoices</a>
+    <a href="{{ $repair ? route('repairs.show', $repair) : route('invoices.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> {{ $repair ? 'Back to Repair #' . $repair->repair_number : 'Back to Invoices' }}</a>
     <h3 class="page-title mt-2 mb-0">Create Invoice</h3>
 </div>
+
+@if($repair)
+<div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-3 mb-4" role="alert">
+    <i class="bi bi-tools fs-4"></i>
+    <div>
+        <strong>Generating invoice for Repair Job #{{ $repair->repair_number }}</strong><br>
+        <span class="text-muted small">Items have been pre-filled from the repair. You can adjust them before saving.</span>
+    </div>
+</div>
+@endif
 
 <div class="card shadow-sm border-0">
     <div class="card-body p-4 p-md-5">
@@ -73,6 +83,24 @@
                         </tr>
                     </thead>
                     <tbody id="itemsBody">
+                        @if($repair && $repair->items->count() > 0)
+                            @foreach($repair->items as $i => $repairItem)
+                            <tr class="item-row">
+                                <td>
+                                    <input type="text" name="items[{{ $i }}][item_name]" class="form-control bg-light border-0 item-name" required placeholder="Item name" value="{{ $repairItem->repair_type }}">
+                                    <input type="text" name="items[{{ $i }}][sku]" class="form-control bg-light border-0 item-sku mt-1 form-control-sm" placeholder="SKU (optional)" value="{{ $repair->sku ?? '' }}">
+                                </td>
+                                <td><input type="number" name="items[{{ $i }}][quantity]" class="form-control bg-light border-0 text-center qty fw-medium" value="1" min="1" required></td>
+                                <td><input type="number" step="0.01" name="items[{{ $i }}][rate]" class="form-control bg-light border-0 text-end rate fw-medium" value="{{ $repairItem->price ?? '0.00' }}" min="0" required></td>
+                                <td><input type="number" step="0.01" name="items[{{ $i }}][discount]" class="form-control bg-light border-0 text-end discount fw-medium text-danger" value="0.00" min="0"></td>
+                                <td><input type="number" step="0.01" name="items[{{ $i }}][tax]" class="form-control bg-light text-muted border-0 text-end tax fw-medium" value="0.00" min="0" readonly></td>
+                                <td class="text-end fw-bold line-total p-3 text-dark">{{ number_format($repairItem->price ?? 0, 2) }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" {{ $repair->items->count() === 1 ? 'disabled' : '' }}><i class="bi bi-x-lg"></i></button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        @else
                         <tr class="item-row">
                             <td>
                                 <input type="text" name="items[0][item_name]" class="form-control bg-light border-0 item-name" required placeholder="Item name">
@@ -87,6 +115,7 @@
                                 <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" disabled><i class="bi bi-x-lg"></i></button>
                             </td>
                         </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -131,7 +160,8 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let itemIndex = 1;
+    // Start itemIndex from existing row count (handles pre-filled repair items)
+    let itemIndex = document.querySelectorAll('.item-row').length;
     const itemsBody = document.getElementById('itemsBody');
 
     function calculateTotals() {
@@ -145,10 +175,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const discount = parseFloat(row.querySelector('.discount').value) || 0;
             
             const lineSubtotal = qty * rate;
-            const tax = (lineSubtotal - discount) * 0.15;
+            const afterDiscount = lineSubtotal - discount;
+            // Inclusive tax: Tax is already inside the price
+            const tax = afterDiscount - (afterDiscount / 1.15);
             
             row.querySelector('.tax').value = tax.toFixed(2);
-            const lineTotal = lineSubtotal - discount + tax;
+            // Line total = after discount (tax is included)
+            const lineTotal = afterDiscount;
             
             row.querySelector('.line-total').textContent = lineTotal.toFixed(2);
             
@@ -157,11 +190,12 @@ document.addEventListener('DOMContentLoaded', function() {
             totalTax += tax;
         });
         
-        const finalTotal = subtotal - totalDiscount + totalTax;
+        // Total = subtotal - discount (tax is inclusive, no addition)
+        const finalTotal = subtotal - totalDiscount;
         
         document.getElementById('invoiceSubtotal').textContent = '$' + subtotal.toFixed(2);
         document.getElementById('invoiceDiscount').textContent = '-$' + totalDiscount.toFixed(2);
-        document.getElementById('invoiceTax').textContent = '+$' + totalTax.toFixed(2);
+        document.getElementById('invoiceTax').textContent = '$' + totalTax.toFixed(2) + ' (incl.)';
         document.getElementById('invoiceTotal').textContent = '$' + finalTotal.toFixed(2);
         
         const rows = document.querySelectorAll('.item-row');
