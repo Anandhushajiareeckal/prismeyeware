@@ -5,146 +5,255 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt #{{ $invoice->invoice_number }}</title>
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: monospace; color: #000; background-color: #f8f9fa; font-size: 13px; }
-        .ticket { width: 80mm; max-width: 80mm; margin: 20px auto; background: #fff; padding: 10px 10px 30px; }
-        h1, h2, h3, h4, h5, h6, p { margin: 0; padding: 0; }
-        .centered { text-align: center; }
-        .title { font-size: 1.4rem; font-weight: bold; margin-bottom: 2px; }
-        .text-bold { font-weight: bold; }
-        .divider { border-top: 1px dashed #000; margin: 8px 0; }
-        .divider-solid { border-top: 1px solid #000; margin: 8px 0; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 3px 0; vertical-align: top; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .item-name { display: block; max-width: 44mm; word-wrap: break-word; line-height: 1.3; }
-        .btn-print { margin: 20px auto; text-align: center; width: 80mm; display: flex; gap: 10px; justify-content: center; }
-        .btn { padding: 12px 20px; font-family: sans-serif; font-weight: bold; cursor: pointer; text-decoration: none; border-radius: 4px; border: none; font-size: 14px; }
-        .btn-primary { background: #000; color: #fff; }
-        .btn-secondary { background: #e2e8f0; color: #000; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #000;
+            background: #f0f0f0;
+        }
+
+        .receipt-wrap {
+            width: 80mm;
+            margin: 20px auto;
+            background: #fff;
+            padding: 10px 8px 24px;
+        }
+
+        /* Header */
+        .business-name {
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+        .business-info {
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.55;
+            margin-bottom: 8px;
+        }
+
+        /* Transaction line */
+        .txn-line {
+            font-size: 11px;
+            margin: 6px 0;
+        }
+
+        /* Dividers */
+        .dash {
+            border: none;
+            border-top: 1px dashed #000;
+            margin: 6px 0;
+        }
+        .dash-solid {
+            border: none;
+            border-top: 1px solid #000;
+            margin: 6px 0;
+        }
+
+        /* Customer section */
+        .cst-id   { font-size: 11px; margin-bottom: 2px; }
+        .cst-name { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+        .cst-addr { font-size: 11px; line-height: 1.5; margin-bottom: 2px; }
+
+        /* Job type / description */
+        .job-type { font-size: 13px; font-weight: bold; margin: 5px 0 3px; }
+
+        /* Items */
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3px;
+            font-size: 12px;
+        }
+        .item-name  { flex: 1; padding-right: 8px; line-height: 1.4; }
+        .item-price { white-space: nowrap; }
+
+        /* Totals */
+        .totals-table {
+            width: 100%;
+        }
+        .totals-table td {
+            padding: 2px 0;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+        .totals-table .lbl { }
+        .totals-table .amt { text-align: right; white-space: nowrap; }
+
+        .row-total-bold .lbl { font-weight: bold; font-size: 13px; }
+        .row-total-bold .amt { font-weight: bold; font-size: 13px; }
+
+        .row-account .lbl { font-weight: bold; font-size: 15px; letter-spacing: 0.5px; }
+        .row-account .amt { font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .footer .thankyou {
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        /* Print button bar */
+        .btn-bar {
+            width: 80mm;
+            margin: 16px auto;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-family: sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .btn-print { background: #000; color: #fff; }
+        .btn-close  { background: #e0e0e0; color: #000; text-decoration: none; display: inline-block; line-height: 1; }
+
         @media print {
             body { background: #fff; }
-            .ticket { margin: 0; padding: 0; width: 100%; }
-            .btn-print { display: none !important; }
-            @page { margin: 0; width: 80mm; }
+            .receipt-wrap { margin: 0; padding: 4px 4px 24px; width: 80mm; }
+            .btn-bar { display: none !important; }
+            @page { margin: 0; size: 80mm auto; }
         }
     </style>
 </head>
 <body>
+
 @php
-    // Ensure relationships are always loaded regardless of how we got here
     $invoice->loadMissing(['customer', 'items']);
 
     $subtotal       = floatval($invoice->subtotal ?? 0);
     $taxAmount      = floatval($invoice->tax_amount ?? 0);
     $discountAmount = floatval($invoice->discount_amount ?? 0);
-    $totalAmount    = floatval($invoice->total_amount ?? ($subtotal - $discountAmount + $taxAmount));
+    $totalAmount    = floatval($invoice->total_amount ?? ($subtotal - $discountAmount));
+
+    $customer = $invoice->customer;
+    $staffName = $invoice->staff_name ?? 'Staff';
+    $invoiceDate = \Carbon\Carbon::parse($invoice->invoice_date)->format('d-M-Y H:i:s');
 @endphp
 
-    <div class="btn-print">
-        <button onclick="window.print()" class="btn btn-primary">PRINT</button>
-        <a href="{{ url()->previous() }}" class="btn btn-secondary">CLOSE</a>
+{{-- Print Button --}}
+<div class="btn-bar">
+    <button class="btn btn-print" onclick="window.print()">&#128438; PRINT</button>
+    <a href="{{ url()->previous() }}" class="btn btn-close">&#10006; CLOSE</a>
+</div>
+
+<div class="receipt-wrap">
+
+    {{-- Business Header --}}
+    <div class="business-name">Prism Eyewear Repairs And Services</div>
+    <div class="business-info">
+        AD: 6A/100 Queens Road<br>
+        Panmure Auckland-1072<br>
+        PH: 09 948 8080<br>
+        GST# 138-002-128
     </div>
 
-    <div class="ticket">
-        <div class="centered" style="margin-bottom: 8px;">
-            <div class="title">PRISM EYEWEAR</div>
-            <p style="font-size:0.8rem;">Frames | Lenses | Repairs</p>
-            <p style="font-size:0.8rem; margin-top:3px;"><strong>TAX RECEIPT</strong></p>
-        </div>
-
-        <div class="divider"></div>
-
-        <table style="margin: 4px 0;">
-            <tr>
-                <td class="text-bold" style="width: 35%;">Rcpt #:</td>
-                <td>{{ $invoice->invoice_number }}</td>
-            </tr>
-            <tr>
-                <td class="text-bold">Date:</td>
-                <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-M-Y') }}</td>
-            </tr>
-            <tr>
-                <td class="text-bold">Customer:</td>
-                <td>{{ $invoice->customer ? substr($invoice->customer->full_name, 0, 22) : 'Walk-in' }}</td>
-            </tr>
-            <tr>
-                <td class="text-bold">Status:</td>
-                <td>
-                    {{ strtoupper($invoice->payment_status ?? 'N/A') }}
-                    @if($invoice->payment_mode) ({{ $invoice->payment_mode }}) @endif
-                </td>
-            </tr>
-        </table>
-
-        <div class="divider"></div>
-
-        <table style="margin-bottom: 4px;">
-            <thead>
-                <tr>
-                    <th style="width:55%; border-bottom:1px solid #000; padding-bottom:4px; text-align:left;">Item</th>
-                    <th style="width:10%; border-bottom:1px solid #000; padding-bottom:4px; text-align:center;">Qty</th>
-                    <th style="width:35%; border-bottom:1px solid #000; padding-bottom:4px; text-align:right;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($invoice->items as $item)
-                @php
-                    $qty       = intval($item->quantity ?? 1);
-                    $rate      = floatval($item->rate ?? 0);
-                    $disc      = floatval($item->discount ?? 0);
-                    $tax       = floatval($item->tax ?? 0);
-                    $lineTotal = ($qty * $rate) - $disc + $tax;
-                @endphp
-                <tr>
-                    <td style="padding-top:6px;">
-                        <span class="item-name">{{ $item->item_name }}</span>
-                    </td>
-                    <td class="text-center" style="padding-top:6px;">{{ $qty }}</td>
-                    <td class="text-right text-bold" style="padding-top:6px;">${{ number_format($lineTotal, 2) }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="3" style="text-align:center; padding:8px 0; font-style:italic;">No items found</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <div class="divider-solid"></div>
-
-        <table>
-            <tr>
-                <td colspan="2" class="text-right">Subtotal:</td>
-                <td class="text-right" style="width:35%;">${{ number_format($subtotal, 2) }}</td>
-            </tr>
-            @if($discountAmount > 0)
-            <tr>
-                <td colspan="2" class="text-right">Discount:</td>
-                <td class="text-right">-${{ number_format($discountAmount, 2) }}</td>
-            </tr>
-            @endif
-            @if($taxAmount > 0)
-            <tr>
-                <td colspan="2" class="text-right">Tax (Incl. 15%):</td>
-                <td class="text-right">${{ number_format($taxAmount, 2) }}</td>
-            </tr>
-            @endif
-            <tr>
-                <td colspan="2" class="text-right text-bold" style="padding-top:8px; font-size:1.1rem; border-top:1px solid #000;">TOTAL:</td>
-                <td class="text-right text-bold" style="padding-top:8px; font-size:1.1rem; border-top:1px solid #000;">${{ number_format($totalAmount, 2) }}</td>
-            </tr>
-        </table>
-
-        <div class="divider" style="margin-top:12px;"></div>
-
-        <div class="centered" style="margin-top:12px;">
-            <p class="text-bold" style="margin-bottom:4px; font-size:1rem;">Thank You!</p>
-            <p style="font-size:0.8rem;">Please retain receipt for warranty purposes.</p>
-            <p style="font-size:0.75rem; margin-top:15px;">Printed: {{ now()->format('d-M-Y H:i') }}</p>
-            <p style="margin-top:8px; font-size:10px;">============================</p>
-        </div>
+    {{-- Transaction Info Line --}}
+    <div class="txn-line">
+        #{{ $invoice->invoice_number }} {{ $staffName }} {{ $invoiceDate }}
     </div>
+
+    <hr class="dash">
+
+    {{-- Customer Info --}}
+    @if($customer)
+    <div class="cst-id">Cst {{ $customer->id }}</div>
+    <div class="cst-name">{{ $customer->full_name }}</div>
+    <div class="cst-addr">
+        @if($customer->address){{ $customer->address }}<br>@endif
+        @if($customer->city){{ $customer->city }} @endif
+        @if($customer->postal_code){{ $customer->postal_code }}@endif
+        @if($customer->phone)<br>Ph:{{ $customer->phone }}@endif
+    </div>
+    @else
+    <div class="cst-name">Walk-in Customer</div>
+    @endif
+
+    <hr class="dash">
+
+    {{-- Job Description (from repair if linked) --}}
+    @if($invoice->repair && $invoice->repair->job_description)
+    <div class="job-type">{{ $invoice->repair->job_description }}</div>
+    @endif
+
+    {{-- Line Items --}}
+    @foreach($invoice->items as $item)
+    @php
+        $qty   = intval($item->quantity ?? 1);
+        $rate  = floatval($item->rate ?? 0);
+        $disc  = floatval($item->discount ?? 0);
+        $lineTotal = ($qty * $rate) - $disc;
+    @endphp
+    <div class="item-row">
+        <span class="item-name">{{ $item->item_name }}</span>
+        <span class="item-price">${{ number_format($lineTotal, 2) }}</span>
+    </div>
+    @endforeach
+
+    <hr class="dash">
+
+    {{-- Totals --}}
+    <table class="totals-table">
+        <tr class="row-total-bold">
+            <td class="lbl">TOTAL</td>
+            <td class="amt">${{ number_format($totalAmount, 2) }}</td>
+        </tr>
+    </table>
+
+    <hr class="dash">
+
+    <table class="totals-table">
+        @if($taxAmount > 0)
+        <tr>
+            <td class="lbl">GST Amount</td>
+            <td class="amt">${{ number_format($taxAmount, 2) }}</td>
+        </tr>
+        @endif
+        @if($discountAmount > 0)
+        <tr>
+            <td class="lbl">Discount</td>
+            <td class="amt">-${{ number_format($discountAmount, 2) }}</td>
+        </tr>
+        @endif
+    </table>
+
+    <hr class="dash-solid">
+
+    <table class="totals-table">
+        <tr class="row-account">
+            <td class="lbl">ACCOUNT</td>
+            <td class="amt">${{ number_format($totalAmount, 2) }}</td>
+        </tr>
+    </table>
+
+    {{-- Footer --}}
+    <div class="footer">
+        <div class="thankyou">Thank You!</div>
+        <div>Prism Eyewear Repairs &amp; Services</div>
+        <div>9429051081454</div>
+    </div>
+
+</div>
+
+<script>
+    // For thermal printers that are set as the default printer, automatically trigger print
+    // Remove or comment this out if you prefer manual printing
+    // window.onload = function() { window.print(); };
+</script>
 </body>
 </html>
