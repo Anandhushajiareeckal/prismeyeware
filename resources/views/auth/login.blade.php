@@ -416,7 +416,7 @@
                             name="email"
                             value="{{ old('email') }}"
                             autocomplete="email"
-                            placeholder="admin@prismeyewear.com"
+                            placeholder="Email"
                             required
                         >
                         <i class="bi bi-envelope icon"></i>
