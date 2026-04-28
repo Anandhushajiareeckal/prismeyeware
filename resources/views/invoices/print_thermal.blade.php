@@ -9,7 +9,8 @@
 
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: bold;
             color: #000;
             background: #f0f0f0;
         }
@@ -56,8 +57,12 @@
 
         /* Customer section */
         .cst-id   { font-size: 11px; margin-bottom: 2px; }
-        .cst-name { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+        .cst-name { font-size: 15px; font-weight: bold; letter-spacing: 2px; margin-bottom: 4px; }
         .cst-addr { font-size: 11px; line-height: 1.5; margin-bottom: 2px; }
+
+        /* Note block */
+        .note-block { font-size: 11px; margin-top: 10px; line-height: 1.5; text-align: left; }
+        .note-label { font-weight: bold; }
 
         /* Job type / description */
         .job-type { font-size: 13px; font-weight: bold; margin: 5px 0 3px; }
@@ -143,7 +148,7 @@
 
     $customer = $invoice->customer;
     $staffName = $invoice->staff_name ?? 'Staff';
-    $invoiceDate = \Carbon\Carbon::parse($invoice->invoice_date)->format('d-M-Y H:i:s');
+    $invoiceDate = \Carbon\Carbon::parse($invoice->created_at ?? $invoice->invoice_date)->format('d-M-Y H:i:s');
 @endphp
 
 {{-- Print Button --}}
@@ -155,11 +160,11 @@
 <div class="receipt-wrap">
 
     {{-- Business Header --}}
-    <div class="business-name">Prism Eyewear Repairs And Services</div>
+    <div class="business-name">Prism Eyewear</div>
     <div class="business-info">
         AD: 6A/100 Queens Road<br>
         Panmure Auckland-1072<br>
-        PH: 09 948 8080<br>
+        PH: 09 948 8080 / 02108321242<br>
         GST# 138-002-128
     </div>
 
@@ -240,6 +245,12 @@
             <td class="amt">${{ number_format($totalAmount, 2) }}</td>
         </tr>
     </table>
+
+    @if($invoice->notes)
+    <div class="note-block">
+        <span class="note-label">Note: </span>{!! nl2br(e($invoice->notes)) !!}
+    </div>
+    @endif
 
     {{-- Footer --}}
     <div class="footer">
