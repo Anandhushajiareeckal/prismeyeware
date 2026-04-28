@@ -129,10 +129,23 @@
         .btn-close  { background: #e0e0e0; color: #000; text-decoration: none; display: inline-block; line-height: 1; }
 
         @media print {
-            body { background: #fff; }
-            .receipt-wrap { margin: 0; padding: 4px 4px 24px; width: 80mm; }
+            @page { 
+                margin: 0; 
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: #fff;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+            }
+            .receipt-wrap { 
+                margin: 0; 
+                padding: 0; /* Epson drivers handle the edge spacing automatically; avoid explicit padding that causes scaling */
+                width: 100%; /* Let Epson fill the 72mm logical print width */
+                max-width: 100%;
+            }
             .btn-bar { display: none !important; }
-            @page { margin: 0; size: 80mm auto; }
         }
     </style>
 </head>
