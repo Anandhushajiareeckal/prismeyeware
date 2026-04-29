@@ -301,7 +301,7 @@
      * This makes the site "trusted" so "Remember this decision" works.
      */
     qz.security.setCertificatePromise(function(resolve, reject) {
-        fetch('{{ asset('digital-certificate.txt') }}')
+        fetch('{{ route('qz.cert') }}')
             .then(r => r.ok ? r.text() : reject('Certificate not found'))
             .then(resolve)
             .catch(reject);

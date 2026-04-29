@@ -67,6 +67,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
     Route::resource('repair-types', \App\Http\Controllers\RepairTypeController::class)->only(['index', 'store', 'destroy']);
 
+    // QZ Tray — serve certificate (via route, not static file, to bypass ad blockers)
+    Route::get('/qz-cert', function () {
+        $cert = file_get_contents(public_path('digital-certificate.txt'));
+        return response($cert, 200)->header('Content-Type', 'text/plain');
+    })->name('qz.cert');
+
     // QZ Tray — sign print requests with private key (removes "Untrusted website" popup)
     Route::post('/qz-sign', function (\Illuminate\Http\Request $request) {
         $keyPath = storage_path('app/private-key.pem');
