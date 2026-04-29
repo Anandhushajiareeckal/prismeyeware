@@ -169,7 +169,7 @@ class InvoiceController extends Controller
 
     public function printThermal(Invoice $invoice)
     {
-        $invoice->load(['customer', 'items']);
+        $invoice->load(['customer', 'items', 'repair']);
         return view('invoices.print_thermal', compact('invoice'));
     }
 }

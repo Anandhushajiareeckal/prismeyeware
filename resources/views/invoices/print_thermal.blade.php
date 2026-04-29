@@ -9,108 +9,128 @@
 
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #000;
             background: #f0f0f0;
         }
 
         .receipt-wrap {
-            width: 80mm;
+            width: 76mm;
             margin: 20px auto;
             background: #fff;
-            padding: 10px 8px 24px;
+            padding: 8px 6px 20px;
         }
 
         /* Header */
         .business-name {
             text-align: center;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             line-height: 1.4;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .business-info {
             text-align: center;
-            font-size: 11px;
-            line-height: 1.55;
-            margin-bottom: 8px;
+            font-size: 10px;
+            line-height: 1.6;
+            margin-bottom: 6px;
         }
 
         /* Transaction line */
         .txn-line {
-            font-size: 11px;
-            margin: 6px 0;
+            font-size: 10px;
+            margin: 4px 0;
+            word-break: break-all;
         }
 
         /* Dividers */
         .dash {
             border: none;
             border-top: 1px dashed #000;
-            margin: 6px 0;
+            margin: 5px 0;
         }
         .dash-solid {
             border: none;
             border-top: 1px solid #000;
-            margin: 6px 0;
+            margin: 5px 0;
         }
 
         /* Customer section */
-        .cst-id   { font-size: 11px; margin-bottom: 2px; }
-        .cst-name { font-size: 15px; font-weight: bold; letter-spacing: 2px; margin-bottom: 4px; }
-        .cst-addr { font-size: 11px; line-height: 1.5; margin-bottom: 2px; }
-
-        /* Note block */
-        .note-block { font-size: 11px; margin-top: 10px; line-height: 1.5; text-align: left; }
-        .note-label { font-weight: bold; }
+        .cst-id   { font-size: 10px; margin-bottom: 1px; }
+        .cst-name { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 3px; }
+        .cst-addr { font-size: 10px; line-height: 1.5; margin-bottom: 2px; }
 
         /* Job type / description */
-        .job-type { font-size: 13px; font-weight: bold; margin: 5px 0 3px; }
+        .job-type { font-size: 11px; font-weight: bold; margin: 4px 0 2px; }
 
-        /* Items */
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 3px;
-            font-size: 12px;
+        /* Items - using table for reliable Epson rendering, no flexbox */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .item-name  { flex: 1; padding-right: 8px; line-height: 1.4; }
-        .item-price { white-space: nowrap; }
+        .items-table td {
+            padding: 1px 0;
+            font-size: 11px;
+            vertical-align: top;
+        }
+        .items-table .td-name {
+            width: 70%;
+            word-break: break-word;
+            line-height: 1.4;
+            padding-right: 4px;
+        }
+        .items-table .td-price {
+            width: 30%;
+            text-align: right;
+            white-space: nowrap;
+        }
 
         /* Totals */
         .totals-table {
             width: 100%;
+            border-collapse: collapse;
         }
         .totals-table td {
             padding: 2px 0;
-            font-size: 12px;
+            font-size: 11px;
             vertical-align: middle;
         }
-        .totals-table .lbl { }
-        .totals-table .amt { text-align: right; white-space: nowrap; }
+        .totals-table .lbl { width: 60%; }
+        .totals-table .amt { width: 40%; text-align: right; white-space: nowrap; }
 
-        .row-total-bold .lbl { font-weight: bold; font-size: 13px; }
-        .row-total-bold .amt { font-weight: bold; font-size: 13px; }
+        .row-total-bold .lbl { font-weight: bold; font-size: 12px; }
+        .row-total-bold .amt { font-weight: bold; font-size: 12px; }
 
-        .row-account .lbl { font-weight: bold; font-size: 15px; letter-spacing: 0.5px; }
-        .row-account .amt { font-weight: bold; font-size: 18px; letter-spacing: 1px; }
+        .row-account .lbl { font-weight: bold; font-size: 13px; letter-spacing: 0.5px; }
+        .row-account .amt { font-weight: bold; font-size: 16px; letter-spacing: 1px; }
+
+        /* Payment mode */
+        .pay-mode {
+            font-size: 11px;
+            margin: 3px 0;
+        }
+
+        /* Note block */
+        .note-block { font-size: 10px; margin-top: 8px; line-height: 1.5; }
+        .note-label { font-weight: bold; }
 
         /* Footer */
         .footer {
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             margin-top: 10px;
-            line-height: 1.6;
+            line-height: 1.7;
         }
         .footer .thankyou {
             font-size: 13px;
-            margin-bottom: 4px;
+            font-weight: bold;
+            margin-bottom: 2px;
         }
 
         /* Print button bar */
         .btn-bar {
-            width: 80mm;
+            width: 76mm;
             margin: 16px auto;
             display: flex;
             gap: 10px;
@@ -126,24 +146,33 @@
             font-size: 13px;
         }
         .btn-print { background: #000; color: #fff; }
-        .btn-close  { background: #e0e0e0; color: #000; text-decoration: none; display: inline-block; line-height: 1; }
+        .btn-close  { background: #e0e0e0; color: #000; text-decoration: none;
+                      display: inline-flex; align-items: center; justify-content: center; }
 
+        /* ─── Epson Thermal Print Styles ─────────────────────────────────────
+           Key fixes:
+           1. @page size: 80mm auto  — tells browser this is a roll, not A4
+           2. width: 100% on receipt-wrap — fills the 72mm printable area
+           3. No margin/padding on html/body — Epson driver adds its own margins
+           4. -webkit-print-color-adjust + print-color-adjust for ink savings
+        ─────────────────────────────────────────────────────────────────── */
         @media print {
-            @page { 
-                margin: 0; 
+            @page {
+                size: 80mm auto;   /* 80mm wide roll, auto height */
+                margin: 0mm;       /* Epson driver controls physical margins */
             }
             html, body {
                 margin: 0;
                 padding: 0;
-                background: #fff;
-                width: 100%;
+                background: #fff !important;
+                width: 80mm;
                 -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
-            .receipt-wrap { 
-                margin: 0; 
-                padding: 0; /* Epson drivers handle the edge spacing automatically; avoid explicit padding that causes scaling */
-                width: 100%; /* Let Epson fill the 72mm logical print width */
-                max-width: 100%;
+            .receipt-wrap {
+                width: 100%;
+                margin: 0;
+                padding: 4px 4px 16px;
             }
             .btn-bar { display: none !important; }
         }
@@ -152,16 +181,18 @@
 <body>
 
 @php
-    $invoice->loadMissing(['customer', 'items']);
+    $invoice->loadMissing(['customer', 'items', 'repair']);
 
     $subtotal       = floatval($invoice->subtotal ?? 0);
     $taxAmount      = floatval($invoice->tax_amount ?? 0);
     $discountAmount = floatval($invoice->discount_amount ?? 0);
     $totalAmount    = floatval($invoice->total_amount ?? ($subtotal - $discountAmount));
 
-    $customer = $invoice->customer;
-    $staffName = $invoice->staff_name ?? 'Staff';
-    $invoiceDate = \Carbon\Carbon::parse($invoice->created_at ?? $invoice->invoice_date)->format('d-M-Y H:i:s');
+    $customer    = $invoice->customer;
+    $staffName   = $invoice->staff_name ?? 'Staff';
+    $paymentMode = $invoice->payment_mode ?? null;
+    $invoiceDate = \Carbon\Carbon::parse($invoice->created_at ?? $invoice->invoice_date)->format('d-M-Y H:i');
+    $jobDesc     = optional($invoice->repair)->job_description;
 @endphp
 
 {{-- Print Button --}}
@@ -175,15 +206,15 @@
     {{-- Business Header --}}
     <div class="business-name">Prism Eyewear</div>
     <div class="business-info">
-        AD: 6A/100 Queens Road<br>
+        6/100 Queens Road<br>
         Panmure Auckland-1072<br>
         PH: 09 948 8080 / 02108321242<br>
         GST# 138-002-128
     </div>
 
-    {{-- Transaction Info Line --}}
+    {{-- Transaction Info --}}
     <div class="txn-line">
-        #{{ $invoice->invoice_number }} {{ $staffName }} {{ $invoiceDate }}
+        #{{ $invoice->invoice_number }} &nbsp; {{ $staffName }} &nbsp; {{ $invoiceDate }}
     </div>
 
     <hr class="dash">
@@ -191,37 +222,42 @@
     {{-- Customer Info --}}
     @if($customer)
     <div class="cst-id">Cst {{ $customer->id }}</div>
-    <div class="cst-name">{{ $customer->full_name }}</div>
+    <div class="cst-name">{{ strtoupper($customer->full_name) }}</div>
     <div class="cst-addr">
         @if($customer->address){{ $customer->address }}<br>@endif
         @if($customer->city){{ $customer->city }} @endif
         @if($customer->postal_code){{ $customer->postal_code }}@endif
-        @if($customer->phone)<br>Ph:{{ $customer->phone }}@endif
+        @if($customer->phone)<br>Ph: {{ $customer->phone }}@endif
     </div>
     @else
-    <div class="cst-name">Walk-in Customer</div>
+    <div class="cst-name">WALK-IN CUSTOMER</div>
     @endif
 
     <hr class="dash">
 
     {{-- Job Description (from repair if linked) --}}
-    @if($invoice->repair && $invoice->repair->job_description)
-    <div class="job-type">{{ $invoice->repair->job_description }}</div>
+    @if($jobDesc)
+    <div class="job-type">{{ $jobDesc }}</div>
     @endif
 
-    {{-- Line Items --}}
-    @foreach($invoice->items as $item)
-    @php
-        $qty   = intval($item->quantity ?? 1);
-        $rate  = floatval($item->rate ?? 0);
-        $disc  = floatval($item->discount ?? 0);
-        $lineTotal = ($qty * $rate) - $disc;
-    @endphp
-    <div class="item-row">
-        <span class="item-name">{{ $item->item_name }}</span>
-        <span class="item-price">${{ number_format($lineTotal, 2) }}</span>
-    </div>
-    @endforeach
+    {{-- Line Items — table-based for reliable Epson rendering --}}
+    <table class="items-table">
+        @foreach($invoice->items as $item)
+        @php
+            $qty       = intval($item->quantity ?? 1);
+            $rate      = floatval($item->rate ?? 0);
+            $disc      = floatval($item->discount ?? 0);
+            $lineTotal = ($qty * $rate) - $disc;
+        @endphp
+        <tr>
+            <td class="td-name">
+                {{ $item->item_name }}
+                @if($qty > 1) x{{ $qty }}@endif
+            </td>
+            <td class="td-price">${{ number_format($lineTotal, 2) }}</td>
+        </tr>
+        @endforeach
+    </table>
 
     <hr class="dash">
 
@@ -238,7 +274,7 @@
     <table class="totals-table">
         @if($taxAmount > 0)
         <tr>
-            <td class="lbl">GST Amount</td>
+            <td class="lbl">GST Incl.</td>
             <td class="amt">${{ number_format($taxAmount, 2) }}</td>
         </tr>
         @endif
@@ -259,25 +295,37 @@
         </tr>
     </table>
 
+    {{-- Payment Mode --}}
+    @if($paymentMode)
+    <div class="pay-mode">Paid by: {{ $paymentMode }}</div>
+    @endif
+
     @if($invoice->notes)
     <div class="note-block">
         <span class="note-label">Note: </span>{!! nl2br(e($invoice->notes)) !!}
     </div>
     @endif
 
+    <hr class="dash">
+
     {{-- Footer --}}
     <div class="footer">
         <div class="thankyou">Thank You!</div>
-        <div>Prism Eyewear Repairs &amp; Services</div>
+        <div>Prism Eyewear</div>
         <div>9429051081454</div>
+        <div>{{ $invoiceDate }}</div>
     </div>
 
 </div>
 
 <script>
-    // For thermal printers that are set as the default printer, automatically trigger print
-    // Remove or comment this out if you prefer manual printing
-    // window.onload = function() { window.print(); };
+    // Auto-trigger print dialog when page loads (for Epson thermal printers set as default)
+    window.addEventListener('load', function () {
+        // Small delay ensures CSS is fully applied before print dialog opens
+        setTimeout(function () {
+            window.print();
+        }, 400);
+    });
 </script>
 </body>
 </html>
