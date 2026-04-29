@@ -327,10 +327,10 @@
 </script>
 
 {{-- ── Our ESC/POS builder ─────────────────────────────────── --}}
-<script src="{{ asset('js/escpos-builder.js') }}"></script>
+<script src="{{ asset('js/escpos-builder.js') }}?v={{ filemtime(public_path('js/escpos-builder.js')) }}"></script>
 
 {{-- ── QZ connection + print dispatcher ───────────────────── --}}
-<script src="{{ asset('js/qz-print.js') }}"></script>
+<script src="{{ asset('js/qz-print.js') }}?v={{ filemtime(public_path('js/qz-print.js')) }}"></script>
 
 {{-- ── Page orchestration ──────────────────────────────────── --}}
 <script>
