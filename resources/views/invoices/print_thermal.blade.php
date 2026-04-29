@@ -294,6 +294,38 @@
 {{-- ── QZ Tray official client library (CDN) ─────────────── --}}
 <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
 
+{{-- ── QZ Tray certificate + request signing (removes "Untrusted" popup) --}}
+<script>
+    /**
+     * Tell QZ Tray to use our self-signed certificate.
+     * This makes the site "trusted" so "Remember this decision" works.
+     */
+    qz.security.setCertificatePromise(function(resolve, reject) {
+        fetch('{{ asset('digital-certificate.txt') }}')
+            .then(r => r.ok ? r.text() : reject('Certificate not found'))
+            .then(resolve)
+            .catch(reject);
+    });
+
+    qz.security.setSignatureAlgorithm("SHA512");
+
+    qz.security.setSignaturePromise(function(toSign) {
+        return function(resolve, reject) {
+            fetch('{{ route('qz.sign') }}', {
+                method  : 'POST',
+                headers : {
+                    'Content-Type'  : 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN'  : '{{ csrf_token() }}',
+                },
+                body : 'request=' + encodeURIComponent(toSign),
+            })
+            .then(r => r.ok ? r.text() : reject('Signing failed'))
+            .then(resolve)
+            .catch(reject);
+        };
+    });
+</script>
+
 {{-- ── Our ESC/POS builder ─────────────────────────────────── --}}
 <script src="{{ asset('js/escpos-builder.js') }}"></script>
 

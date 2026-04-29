@@ -66,4 +66,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
     Route::resource('repair-types', \App\Http\Controllers\RepairTypeController::class)->only(['index', 'store', 'destroy']);
+
+    // QZ Tray — sign print requests with private key (removes "Untrusted website" popup)
+    Route::post('/qz-sign', function (\Illuminate\Http\Request $request) {
+        $keyPath = public_path('private-key.pem');
+        if (!file_exists($keyPath)) {
+            return response('Private key not found.', 500);
+        }
+        $privateKey = openssl_pkey_get_private(file_get_contents($keyPath));
+        openssl_sign($request->input('request', ''), $signature, $privateKey, OPENSSL_ALGO_SHA512);
+        return base64_encode($signature);
+    })->name('qz.sign');
 });
