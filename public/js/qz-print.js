@@ -10,7 +10,7 @@
 /* ─── Configuration ──────────────────────────────────────── */
 const QZ_CONFIG = {
     /** Exact Windows printer name as shown in Devices & Printers */
-    printerName : 'PRP-250CL',
+    printerName : 'EPSON TM-T88V Receipt',
 
     /** Set true to print a Code128 barcode of the invoice number */
     printBarcode : false,
