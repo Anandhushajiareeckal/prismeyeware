@@ -356,17 +356,16 @@
     }
 
     /**
-     * On page load: connect to QZ Tray and auto-print.
+     * On page load: connect to QZ Tray, then wait for user to click PRINT.
+     * (Auto-print removed — it caused duplicate jobs when QZ Tray's
+     *  trust dialog blocked the first attempt and retried.)
      */
     window.addEventListener('load', async () => {
         setStatus('🔌 Connecting to QZ Tray…', 'connecting');
         try {
             await connectQZ();
-            setStatus('✅ QZ Tray connected — printing…', 'success');
+            setStatus('✅ QZ Tray ready — click PRINT to continue.', 'success');
             printBtn.disabled = false;
-
-            // Auto-print immediately
-            await triggerPrint();
 
         } catch (err) {
             console.error(err);
