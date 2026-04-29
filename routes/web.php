@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
 
     // QZ Tray — sign print requests with private key (removes "Untrusted website" popup)
     Route::post('/qz-sign', function (\Illuminate\Http\Request $request) {
-        $keyPath = public_path('private-key.pem');
+        $keyPath = storage_path('app/private-key.pem');
         if (!file_exists($keyPath)) {
             return response('Private key not found.', 500);
         }
