@@ -25,6 +25,7 @@ class StoreCustomerRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
+            'business' => 'nullable|string|max:255',
             'gender' => 'nullable|string|in:Male,Female,Other',
             'date_of_birth' => 'nullable|date',
             'phone_number' => 'nullable|string|max:255',

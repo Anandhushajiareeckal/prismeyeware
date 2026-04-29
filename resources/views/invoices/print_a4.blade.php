@@ -318,7 +318,7 @@
                 <div>
                     <div class="bill-to-label">Bill To</div>
                     @if($invoice->customer)
-                        <div class="bill-to-name">{{ $invoice->customer->customer_number ?? $invoice->customer->full_name }}</div>
+                        <!-- <div class="bill-to-name">{{ $invoice->customer->customer_number ?? $invoice->customer->full_name }}</div> -->
                         <div class="bill-to-detail">
                             {{ $invoice->customer->full_name }}<br>
                             @if($invoice->customer->address){{ $invoice->customer->address }}<br>@endif

@@ -14,13 +14,17 @@
             
             <h5 class="mb-3 text-primary fw-semibold border-bottom pb-2">Personal Details</h5>
             <div class="row g-3 mb-4">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">First Name <span class="text-danger">*</span></label>
                     <input type="text" name="first_name" class="form-control bg-light border-0 @error('first_name') is-invalid @enderror" value="{{ old('first_name', $customer->first_name) }}" required>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">Last Name</label>
                     <input type="text" name="last_name" class="form-control bg-light border-0" value="{{ old('last_name', $customer->last_name) }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted fw-medium">Business</label>
+                    <input type="text" name="business" class="form-control bg-light border-0" value="{{ old('business', $customer->business) }}">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">Gender</label>
