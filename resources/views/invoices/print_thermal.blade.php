@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt #{{ $invoice->invoice_number }}</title>
     <style>
-        /* ── Reset ───────────────────────────────────────────── */
+        /* ── Screen styles (preview) ─────────────────────────── */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -20,26 +20,9 @@
             padding: 24px 16px;
         }
 
-        /* ── Status banner ───────────────────────────────────── */
-        #qz-status {
-            width: 76mm;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-        }
-        #qz-status.connecting { background:#fff3cd; color:#856404; border:1px solid #ffc107; }
-        #qz-status.success    { background:#d1e7dd; color:#0a3622; border:1px solid #198754; }
-        #qz-status.error      { background:#f8d7da; color:#58151c; border:1px solid #dc3545; }
-        #qz-status.idle       { background:#e2e3e5; color:#41464b; border:1px solid #adb5bd; display:none; }
-
         /* ── Button bar ──────────────────────────────────────── */
         .btn-bar {
-            width: 76mm;
+            width: 80mm;
             display: flex;
             gap: 8px;
             justify-content: center;
@@ -56,7 +39,6 @@
             transition: opacity 0.15s;
         }
         .btn:hover { opacity: 0.85; }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-print  { background: #212529; color: #fff; }
         .btn-reprint{ background: #0d6efd; color: #fff; }
         .btn-close  {
@@ -65,13 +47,15 @@
             display: inline-flex; align-items: center; justify-content: center;
         }
 
-        /* ── Receipt preview ─────────────────────────────────── */
+        /* ── Receipt preview (screen only) ──────────────────── */
         .receipt-wrap {
-            width: 76mm;
+            width: 80mm;
             background: #fff;
             padding: 8px 6px 20px;
-            font-weight: bold;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
         }
+
+        /* ── Shared receipt styles ───────────────────────────── */
         .business-name {
             text-align: center;
             font-size: 14px;
@@ -86,12 +70,12 @@
             margin-bottom: 6px;
         }
         .txn-line { font-size: 10px; margin: 4px 0; }
-        .dash     { border: none; border-top: 1px dashed #000; margin: 5px 0; }
-        .dash-solid { border: none; border-top: 1px solid #000; margin: 5px 0; }
-        .cst-id   { font-size: 10px; margin-bottom: 1px; }
-        .cst-name { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 3px; }
-        .cst-addr { font-size: 10px; line-height: 1.5; margin-bottom: 2px; }
-        .job-type { font-size: 11px; font-weight: bold; margin: 4px 0 2px; }
+        .dash      { border: none; border-top: 1px dashed #000; margin: 5px 0; }
+        .dash-solid{ border: none; border-top: 1px solid #000; margin: 5px 0; }
+        .cst-id    { font-size: 10px; margin-bottom: 1px; }
+        .cst-name  { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 3px; }
+        .cst-addr  { font-size: 10px; line-height: 1.5; margin-bottom: 2px; }
+        .job-type  { font-size: 11px; font-weight: bold; margin: 4px 0 2px; }
         .items-table { width: 100%; border-collapse: collapse; }
         .items-table td { padding: 1px 0; font-size: 11px; vertical-align: top; }
         .items-table .td-name  { width: 70%; word-break: break-word; padding-right: 4px; }
@@ -103,11 +87,37 @@
         .row-total-bold .lbl, .row-total-bold .amt { font-weight: bold; font-size: 12px; }
         .row-account .lbl { font-weight: bold; font-size: 13px; letter-spacing: 0.5px; }
         .row-account .amt { font-weight: bold; font-size: 16px; letter-spacing: 1px; }
-        .pay-mode  { font-size: 11px; margin: 3px 0; }
-        .note-block{ font-size: 10px; margin-top: 8px; line-height: 1.5; }
-        .note-label{ font-weight: bold; }
-        .footer    { text-align: center; font-size: 10px; margin-top: 10px; line-height: 1.7; }
+        .pay-mode   { font-size: 11px; margin: 3px 0; }
+        .note-block { font-size: 10px; margin-top: 8px; line-height: 1.5; }
+        .note-label { font-weight: bold; }
+        .footer     { text-align: center; font-size: 10px; margin-top: 10px; line-height: 1.7; }
         .footer .thankyou { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+
+        /* ── Print styles ────────────────────────────────────── */
+        @media print {
+            /* Hide everything except the receipt */
+            .btn-bar, .no-print { display: none !important; }
+
+            /* Remove page margins and background */
+            @page {
+                size: 80mm auto;   /* 80mm wide, auto height = no page break */
+                margin: 0;
+            }
+
+            html, body {
+                width: 80mm;
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+
+            .receipt-wrap {
+                width: 80mm;
+                box-shadow: none !important;
+                padding: 4px 4px 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -127,17 +137,14 @@
     $jobDesc     = optional($invoice->repair)->job_description;
 @endphp
 
-{{-- QZ status --}}
-<div id="qz-status" class="connecting">🔌 Connecting to QZ Tray…</div>
-
-{{-- Button bar --}}
-<div class="btn-bar">
-    <button id="btn-print" class="btn btn-print" disabled onclick="triggerPrint()">🖨 PRINT</button>
-    <button class="btn btn-reprint" onclick="triggerPrint()">↺ RE-PRINT</button>
+{{-- Button bar (hidden on print) --}}
+<div class="btn-bar no-print">
+    <button class="btn btn-print" onclick="window.print()">🖨 PRINT</button>
+    <button class="btn btn-reprint" onclick="window.print()">↺ RE-PRINT</button>
     <a href="{{ url()->previous() }}" class="btn btn-close">✕ CLOSE</a>
 </div>
 
-{{-- Visual preview (on-screen only, NOT used for actual printing) --}}
+{{-- Receipt (this is what gets printed) --}}
 <div class="receipt-wrap">
 
     <div class="business-name">Prism Eyewear</div>
@@ -244,134 +251,10 @@
 
 </div>
 
-{{-- ── Blade → JS data injection ─────────────────────────── --}}
 <script>
-    /**
-     * Invoice data serialised from Laravel Blade.
-     * This is the SINGLE source of truth for the ESC/POS builder.
-     */
-    const invoiceData = {
-        invoiceNumber  : @json($invoice->invoice_number),
-        invoiceDate    : @json($invoiceDate),
-        staffName      : @json($staffName),
-        paymentMode    : @json($paymentMode),
-        notes          : @json($invoice->notes ?? ''),
-        jobDescription : @json($jobDesc ?? ''),
-        subtotal       : {{ $subtotal }},
-        taxAmount      : {{ $taxAmount }},
-        discountAmount : {{ $discountAmount }},
-        totalAmount    : {{ $totalAmount }},
-
-        customer : @if($customer) {
-            id         : {{ $customer->id }},
-            name       : @json($customer->full_name),
-            address    : @json($customer->address_line_1 ?? ''),
-            city       : @json($customer->city       ?? ''),
-            postalCode : @json($customer->postal_code ?? ''),
-            phone      : @json($customer->phone_number ?? ''),
-        } @else null @endif,
-
-        items : [
-            @foreach($invoice->items as $item)
-            @php
-                $qty       = intval($item->quantity ?? 1);
-                $rate      = floatval($item->rate   ?? 0);
-                $disc      = floatval($item->discount ?? 0);
-                $lineTotal = ($qty * $rate) - $disc;
-            @endphp
-            {
-                name      : @json($item->item_name),
-                qty       : {{ $qty }},
-                rate      : {{ $rate }},
-                discount  : {{ $disc }},
-                lineTotal : {{ $lineTotal }},
-            },
-            @endforeach
-        ],
-    };
-</script>
-
-{{-- ── QZ Tray official client library (CDN) ─────────────── --}}
-<script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
-
-{{-- ── QZ Tray certificate + request signing (removes "Untrusted" popup) --}}
-<script>
-    /**
-     * Tell QZ Tray to use our self-signed certificate.
-     * This makes the site "trusted" so "Remember this decision" works.
-     */
-    qz.security.setCertificatePromise(function(resolve, reject) {
-        fetch('{{ route('qz.cert') }}')
-            .then(r => r.ok ? r.text() : reject('Certificate not found'))
-            .then(resolve)
-            .catch(reject);
-    });
-
-    qz.security.setSignatureAlgorithm("SHA512");
-
-    qz.security.setSignaturePromise(function(toSign) {
-        return function(resolve, reject) {
-            fetch('{{ route('qz.sign') }}', {
-                method  : 'POST',
-                headers : {
-                    'Content-Type'  : 'application/x-www-form-urlencoded',
-                    'X-CSRF-TOKEN'  : '{{ csrf_token() }}',
-                },
-                body : 'request=' + encodeURIComponent(toSign),
-            })
-            .then(r => r.ok ? r.text() : reject('Signing failed'))
-            .then(resolve)
-            .catch(reject);
-        };
-    });
-</script>
-
-{{-- ── Our ESC/POS builder ─────────────────────────────────── --}}
-<script src="{{ asset('js/escpos-builder.js') }}?v={{ filemtime(public_path('js/escpos-builder.js')) }}"></script>
-
-{{-- ── QZ connection + print dispatcher ───────────────────── --}}
-<script src="{{ asset('js/qz-print.js') }}?v={{ filemtime(public_path('js/qz-print.js')) }}"></script>
-
-{{-- ── Page orchestration ──────────────────────────────────── --}}
-<script>
-    const statusEl  = document.getElementById('qz-status');
-    const printBtn  = document.getElementById('btn-print');
-
-    function setStatus(msg, type) {
-        statusEl.textContent = msg;
-        statusEl.className   = type;
-    }
-
-    /**
-     * Called by the PRINT / RE-PRINT buttons.
-     */
-    async function triggerPrint() {
-        setStatus('🖨 Sending to printer…', 'connecting');
-        try {
-            await printReceipt(invoiceData);
-            setStatus('✅ Sent to printer successfully!', 'success');
-        } catch (err) {
-            setStatus('❌ ' + (err.message || 'Print failed'), 'error');
-        }
-    }
-
-    /**
-     * On page load: connect to QZ Tray, then wait for user to click PRINT.
-     * (Auto-print removed — it caused duplicate jobs when QZ Tray's
-     *  trust dialog blocked the first attempt and retried.)
-     */
-    window.addEventListener('load', async () => {
-        setStatus('🔌 Connecting to QZ Tray…', 'connecting');
-        try {
-            await connectQZ();
-            setStatus('✅ QZ Tray ready — click PRINT to continue.', 'success');
-            printBtn.disabled = false;
-
-        } catch (err) {
-            console.error(err);
-            setStatus('❌ ' + err.message, 'error');
-            printBtn.disabled = false;   // Allow manual retry
-        }
+    // Auto-print when page loads
+    window.addEventListener('load', () => {
+        setTimeout(() => window.print(), 400);
     });
 </script>
 
