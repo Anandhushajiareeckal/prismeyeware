@@ -18,6 +18,7 @@
                 <thead class="table-light">
                     <tr>
                         <th class="border-bottom-0">Repair No.</th>
+                        <th class="border-bottom-0">Reference / Name</th>
                         <th class="border-bottom-0">Date</th>
                         <th class="border-bottom-0">Customer</th>
                         <th class="border-bottom-0">Type</th>
@@ -30,6 +31,13 @@
                     <tr>
                         <td class="fw-medium">
                             <a href="{{ route('repairs.show', $repair) }}" class="text-decoration-none text-dark">{{ $repair->repair_number }}</a>
+                        </td>
+                        <td>
+                            @if($repair->reference)
+                                <span class="fw-medium text-dark">{{ $repair->reference }}</span>
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
                         </td>
                         <td>{{ \Carbon\Carbon::parse($repair->repair_date)->format('M d, Y') }}</td>
                         <td>

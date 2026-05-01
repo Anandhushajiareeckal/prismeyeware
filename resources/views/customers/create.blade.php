@@ -22,8 +22,12 @@
                     <input type="text" name="last_name" class="form-control bg-light border-0" value="{{ old('last_name') }}">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label text-muted fw-medium">Business</label>
-                    <input type="text" name="business" class="form-control bg-light border-0" value="{{ old('business') }}">
+                    <label class="form-label text-muted fw-medium">Customer Type</label>
+                    <div class="form-check form-switch mt-2">
+                        <input type="hidden" name="business" value="0">
+                        <input class="form-check-input" type="checkbox" name="business" value="1" {{ old('business') ? 'checked' : '' }}>
+                        <label class="form-check-label">Business Customer</label>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">Gender</label>

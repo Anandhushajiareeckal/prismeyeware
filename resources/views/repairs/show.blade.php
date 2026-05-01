@@ -41,6 +41,12 @@
                     <span class="text-muted small fw-bold text-uppercase tracking-wide">Customer</span><br>
                     <a href="{{ route('customers.show', $repair->customer_id) }}" class="fw-medium fs-5 text-dark text-decoration-none">{{ $repair->customer->full_name ?? 'Unknown' }}</a>
                 </div>
+                @if($repair->reference)
+                <div class="mb-3">
+                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Reference / Name</span><br>
+                    <span class="fw-medium text-dark">{{ $repair->reference }}</span>
+                </div>
+                @endif
                 <div class="mb-3">
                     <span class="text-muted small fw-bold text-uppercase tracking-wide">Status</span><br>
                     @php
@@ -60,7 +66,7 @@
                     <span class="fw-medium text-dark">{{ \Carbon\Carbon::parse($repair->repair_date)->format('M d, Y') }}</span>
                 </div>
                 <div class="mb-3">
-                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Target Completion</span><br>
+                    <span class="text-muted small fw-bold text-uppercase tracking-wide">Delivery Date</span><br>
                     <span class="fw-medium text-dark">{{ $repair->completion_date ? \Carbon\Carbon::parse($repair->completion_date)->format('M d, Y') : 'Not set' }}</span>
                 </div>
                 <div class="mb-0">

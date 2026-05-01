@@ -45,6 +45,7 @@
                 <li><a href="{{ route('orders.index') }}" class="sidebar-link {{ request()->routeIs('orders.*') ? 'active' : '' }}"><i class="bi bi-bag"></i> Orders</a></li>
                 <li class="mt-4 mb-2 px-3 text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 600;">Finance</li>
                 <li><a href="{{ route('invoices.index') }}" class="sidebar-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}"><i class="bi bi-receipt"></i> Billing & Invoices</a></li>
+                <li><a href="{{ route('reports.index') }}" class="sidebar-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
                 
                 <li class="nav-title mt-4 mb-2 small text-muted fw-bold text-uppercase px-2 tracking-wide">Settings</li>
                 <li><a href="{{ route('repair-types.index') }}" class="sidebar-link {{ request()->routeIs('repair-types.*') ? 'active' : '' }}"><i class="bi bi-tools"></i> Repair Types</a></li>

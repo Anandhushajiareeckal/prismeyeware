@@ -19,6 +19,7 @@ class StoreRepairRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|exists:customers,id',
+            'reference'   => 'nullable|string|max:255',
             'sku' => 'nullable|string|max:255',
             'repair_date' => 'required|date',
             'items' => 'required|array|min:1',

@@ -226,13 +226,6 @@ function buildReceipt(data) {
     r += ESCPOS.BOLD_OFF;
     r += dashLine('=');
 
-    // Account / Amount Due (extra large)
-    r += ESCPOS.ALIGN_CENTER;
-    r += ESCPOS.BOLD_ON;
-    r += ESCPOS.SIZE_DOUBLE;
-    r += '$' + Number(data.totalAmount).toFixed(2) + LF;
-    r += ESCPOS.SIZE_NORMAL;
-    r += ESCPOS.BOLD_OFF;
     r += ESCPOS.ALIGN_LEFT;
 
     // ── Payment Mode ─────────────────────────────────────────
@@ -255,7 +248,7 @@ function buildReceipt(data) {
     r += 'Prism Eyewear' + LF;
     r += '9429051081454' + LF;
     r += data.invoiceDate + LF;
-    r += LF + LF + LF;   // feed before cut
+    r += LF + LF + LF + LF + LF + LF;   // feed before cut
 
     // ── Cut ──────────────────────────────────────────────────
     r += ESCPOS.CUT_PARTIAL;

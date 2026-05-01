@@ -12,18 +12,27 @@
             @csrf
             @method('PUT')
             
-            <div class="row g-3 mb-4">
-                <div class="col-md-12 mb-3">
+            <div class="row g-3 mb-3">
+                <div class="col-md-12">
                     <label class="form-label text-muted fw-medium">Customer</label>
                     <input type="text" class="form-control bg-light border-0 text-dark fw-medium" value="{{ $repair->customer->full_name ?? 'Unknown' }}" readonly disabled>
                 </div>
+            </div>
 
+            <div class="row g-3 mb-3">
+                <div class="col-md-12">
+                    <label class="form-label fw-medium text-muted">Reference / Name</label>
+                    <input type="text" name="reference" class="form-control bg-light border-0" placeholder="e.g., customer name, frame brand, job reference…" value="{{ old('reference', $repair->reference) }}">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label fw-medium text-muted">Date In <span class="text-danger">*</span></label>
                     <input type="date" name="repair_date" class="form-control bg-light border-0" value="{{ old('repair_date', \Carbon\Carbon::parse($repair->repair_date)->format('Y-m-d')) }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label fw-medium text-muted">Target Completion</label>
+                    <label class="form-label fw-medium text-muted">Delivery Date</label>
                     <input type="date" name="completion_date" class="form-control bg-light border-0" value="{{ old('completion_date', $repair->completion_date ? \Carbon\Carbon::parse($repair->completion_date)->format('Y-m-d') : '') }}">
                 </div>
                 <div class="col-md-4">

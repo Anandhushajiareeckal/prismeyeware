@@ -25,6 +25,11 @@
                     <i class="bi bi-person text-secondary"></i>
                 </div>
                 <h5 class="fw-bold mb-1">{{ $customer->full_name }}</h5>
+                @if($customer->business)
+                <div class="mb-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill small">Business Customer</span>
+                </div>
+                @endif
                 <p class="text-muted small mb-3">
                     <i class="bi bi-telephone-fill me-1"></i> {{ $customer->phone_number ?? 'No phone' }}
                 </p>

@@ -18,6 +18,7 @@ class UpdateRepairRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'reference'   => 'nullable|string|max:255',
             'sku' => 'nullable|string|max:255',
             'repair_date' => 'required|date',
             'items' => 'required|array|min:1',

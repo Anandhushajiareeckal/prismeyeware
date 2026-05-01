@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Repair extends Model
 {
     protected $fillable = [
-        'repair_number', 'customer_id', 'sku', 'repair_date',
+        'repair_number', 'customer_id', 'reference', 'sku', 'repair_date',
         'repair_notes', 'collection_notes', 'assigned_staff', 'repair_price',
         'status', 'completion_date', 'collected_date', 'created_by'
     ];
