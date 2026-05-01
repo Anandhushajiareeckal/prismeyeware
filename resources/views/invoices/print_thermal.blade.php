@@ -136,6 +136,30 @@
     $paymentMode = $invoice->payment_mode ?? null;
     $invoiceDate = \Carbon\Carbon::parse($invoice->created_at ?? $invoice->invoice_date)->format('d-M-Y H:i');
     $jobDesc     = optional($invoice->repair)->job_description;
+
+    // Pre-built for @json() — avoids Blade parse errors with closures/arrays inside @json()
+    $jsCustomer = $customer ? [
+        'id'         => $customer->id,
+        'name'       => $customer->full_name,
+        'address'    => $customer->address_line_1 ?? null,
+        'city'       => $customer->city           ?? null,
+        'postalCode' => $customer->postal_code    ?? null,
+        'phone'      => $customer->phone_number   ?? null,
+    ] : null;
+
+    $jsItems = $invoice->items->map(function ($item) {
+        $qty       = intval($item->quantity  ?? 1);
+        $rate      = floatval($item->rate    ?? 0);
+        $disc      = floatval($item->discount ?? 0);
+        $lineTotal = ($qty * $rate) - $disc;
+        return [
+            'name'      => $item->item_name,
+            'qty'       => $qty,
+            'rate'      => $rate,
+            'discount'  => $disc,
+            'lineTotal' => $lineTotal,
+        ];
+    })->values()->all();
 @endphp
 
 {{-- Button bar (hidden on print) --}}
@@ -260,30 +284,11 @@
 <script>
     /* ── Invoice data from PHP ── */
     const INVOICE_DATA = {
-        invoiceNumber : @json($invoice->invoice_number),
-        invoiceDate   : @json($invoiceDate),
-        staffName     : @json($staffName),
-        customer      : @json($customer ? [
-            'id'         => $customer->id,
-            'name'       => $customer->full_name,
-            'address'    => $customer->address_line_1 ?? null,
-            'city'       => $customer->city        ?? null,
-            'postalCode' => $customer->postal_code  ?? null,
-            'phone'      => $customer->phone_number ?? null,
-        ] : null),
-        items         : @json($invoice->items->map(function($item) {
-            $qty       = intval($item->quantity ?? 1);
-            $rate      = floatval($item->rate    ?? 0);
-            $disc      = floatval($item->discount ?? 0);
-            $lineTotal = ($qty * $rate) - $disc;
-            return [
-                'name'      => $item->item_name,
-                'qty'       => $qty,
-                'rate'      => $rate,
-                'discount'  => $disc,
-                'lineTotal' => $lineTotal,
-            ];
-        })),
+        invoiceNumber  : @json($invoice->invoice_number),
+        invoiceDate    : @json($invoiceDate),
+        staffName      : @json($staffName),
+        customer       : @json($jsCustomer),
+        items          : @json($jsItems),
         subtotal       : @json($subtotal),
         taxAmount      : @json($taxAmount),
         discountAmount : @json($discountAmount),
