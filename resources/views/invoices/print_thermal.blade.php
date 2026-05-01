@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Receipt #{{ $invoice->invoice_number }}</title>
     <style>
         /* ── Screen styles (preview) ─────────────────────────── */
@@ -139,8 +140,8 @@
 
 {{-- Button bar (hidden on print) --}}
 <div class="btn-bar no-print">
-    <button class="btn btn-print" onclick="window.print()">🖨 PRINT</button>
-    <button class="btn btn-reprint" onclick="window.print()">↺ RE-PRINT</button>
+    <button class="btn btn-print" id="btn-qz-print" onclick="triggerPrint()">🖨 PRINT</button>
+    <button class="btn btn-reprint" id="btn-qz-reprint" onclick="triggerPrint()">↺ RE-PRINT</button>
     <a href="{{ url()->previous() }}" class="btn btn-close">✕ CLOSE</a>
 </div>
 
@@ -251,10 +252,64 @@
 
 </div>
 
+{{-- QZ Tray + ESC/POS scripts --}}
+<script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
+<script src="{{ asset('js/escpos-builder.js') }}"></script>
+<script src="{{ asset('js/qz-print.js') }}"></script>
+
 <script>
-    // Auto-print when page loads
+    /* ── Invoice data from PHP ── */
+    const INVOICE_DATA = {
+        invoiceNumber : @json($invoice->invoice_number),
+        invoiceDate   : @json($invoiceDate),
+        staffName     : @json($staffName),
+        customer      : @json($customer ? [
+            'id'         => $customer->id,
+            'name'       => $customer->full_name,
+            'address'    => $customer->address_line_1 ?? null,
+            'city'       => $customer->city        ?? null,
+            'postalCode' => $customer->postal_code  ?? null,
+            'phone'      => $customer->phone_number ?? null,
+        ] : null),
+        items         : @json($invoice->items->map(function($item) {
+            $qty       = intval($item->quantity ?? 1);
+            $rate      = floatval($item->rate    ?? 0);
+            $disc      = floatval($item->discount ?? 0);
+            $lineTotal = ($qty * $rate) - $disc;
+            return [
+                'name'      => $item->item_name,
+                'qty'       => $qty,
+                'rate'      => $rate,
+                'discount'  => $disc,
+                'lineTotal' => $lineTotal,
+            ];
+        })),
+        subtotal       : @json($subtotal),
+        taxAmount      : @json($taxAmount),
+        discountAmount : @json($discountAmount),
+        totalAmount    : @json($totalAmount),
+        paymentMode    : @json($paymentMode),
+        notes          : @json($invoice->notes ?? null),
+        jobDescription : @json($jobDesc ?? null),
+    };
+
+    /* ── Trigger ESC/POS print via QZ Tray ── */
+    async function triggerPrint() {
+        const btn = document.getElementById('btn-qz-print');
+        const btn2 = document.getElementById('btn-qz-reprint');
+        if (btn)  { btn.disabled  = true; btn.textContent  = '⏳ Printing…'; }
+        if (btn2) { btn2.disabled = true; btn2.textContent = '⏳ Printing…'; }
+        try {
+            await printReceipt(INVOICE_DATA);
+        } finally {
+            if (btn)  { btn.disabled  = false; btn.textContent  = '🖨 PRINT'; }
+            if (btn2) { btn2.disabled = false; btn2.textContent = '↺ RE-PRINT'; }
+        }
+    }
+
+    /* ── Auto-print on page load via ESC/POS ── */
     window.addEventListener('load', () => {
-        setTimeout(() => window.print(), 400);
+        setTimeout(triggerPrint, 600);
     });
 </script>
 

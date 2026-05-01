@@ -10,7 +10,7 @@
 /* ─── Configuration ──────────────────────────────────────── */
 const QZ_CONFIG = {
     /** Exact Windows printer name as shown in Devices & Printers */
-    printerName : 'EPSON TM-T88V Receipt',
+    printerName : 'Tysso Thermal Print',
 
     /** Set true to print a Code128 barcode of the invoice number */
     printBarcode : false,
@@ -21,6 +21,47 @@ const QZ_CONFIG = {
 
 /* ─── Internal state ─────────────────────────────────────── */
 let _retries = 0;
+let _qzSetup  = false;
+
+/* ─── QZ Tray security (certificate + signing) ───────────── */
+
+/**
+ * Set up the QZ Tray security callbacks once.
+ * Uses the server-issued certificate and signs each request
+ * with the private key via /qz-sign so the printer always
+ * allows the job without a user prompt.
+ */
+function setupQZSecurity() {
+    if (_qzSetup) return;
+    _qzSetup = true;
+
+    // ── Certificate ─────────────────────────────────────────
+    qz.security.setCertificatePromise(function (resolve, reject) {
+        fetch('/qz-cert', { cache: 'no-store' })
+            .then(r => r.ok ? r.text() : Promise.reject('cert fetch failed'))
+            .then(resolve)
+            .catch(reject);
+    });
+
+    // ── Request signing ──────────────────────────────────────
+    qz.security.setSignatureAlgorithm('SHA512');
+    qz.security.setSignaturePromise(function (toSign) {
+        return function (resolve, reject) {
+            fetch('/qz-sign', {
+                method  : 'POST',
+                headers : {
+                    'Content-Type' : 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN' : document.querySelector('meta[name="csrf-token"]')?.content
+                                     || '',
+                },
+                body    : 'request=' + encodeURIComponent(toSign),
+            })
+            .then(r => r.ok ? r.text() : Promise.reject('sign failed'))
+            .then(resolve)
+            .catch(reject);
+        };
+    });
+}
 
 /* ─── QZ Tray connection ─────────────────────────────────── */
 
@@ -28,6 +69,7 @@ let _retries = 0;
  * Connect to QZ Tray.  Resolves when connected, rejects on failure.
  */
 async function connectQZ() {
+    setupQZSecurity();                    // must be called before connect
     if (qz.websocket.isActive()) return;   // already connected
 
     try {
@@ -108,14 +150,19 @@ async function printReceipt(invoiceData) {
             rawString = appendBarcode(rawString, invoiceData.invoiceNumber);
         }
 
-        // 5. Create QZ config
+        // 5. Convert to Uint8Array → base64 (preserves all ESC/POS bytes)
+        const encoder = new TextEncoder();
+        const bytes   = encoder.encode(rawString);
+        const base64  = btoa(String.fromCharCode(...bytes));
+
+        // 6. Create QZ config
         const config = qz.configs.create(printer, {
             raw : true,
         });
 
-        // 6. Build QZ data array — single raw byte string
+        // 7. Build QZ data array — base64-encoded raw bytes
         const printData = [
-            { type: 'raw', format: 'plain', data: rawString }
+            { type: 'raw', format: 'base64', data: base64 }
         ];
 
         // 7. Send to printer
