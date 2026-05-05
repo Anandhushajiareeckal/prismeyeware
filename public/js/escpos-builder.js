@@ -151,7 +151,8 @@ function buildReceipt(data) {
     // ── Invoice / Transaction line ───────────────────────────
     r += ESCPOS.ALIGN_LEFT;
     r += ESCPOS.SIZE_NORMAL;
-    r += 'Invoice : ' + data.invoiceNumber + LF;
+    const labelStr = (data.displayLabel || 'Invoice').padEnd(7, ' ');
+    r += `${labelStr} : ` + (data.displayNumber || data.invoiceNumber) + LF;
     r += 'Date    : ' + data.invoiceDate   + LF;
     r += 'Staff   : ' + data.staffName     + LF;
 

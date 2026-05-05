@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Receipt #{{ $invoice->invoice_number }}</title>
+    <title>Receipt #{{ optional($invoice->repair)->reference ?: $invoice->invoice_number }}</title>
     <style>
         /* ── Screen styles (preview) ─────────────────────────── */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -147,6 +147,13 @@
         'phone'      => $customer->phone_number   ?? null,
     ] : null;
 
+    $displayLabel  = 'Invoice';
+    $displayNumber = $invoice->invoice_number;
+    if ($invoice->repair && $invoice->repair->reference) {
+        $displayLabel  = 'Ref';
+        $displayNumber = $invoice->repair->reference;
+    }
+
     $jsItems = $invoice->items->map(function ($item) {
         $qty       = intval($item->quantity  ?? 1);
         $rate      = floatval($item->rate    ?? 0);
@@ -181,7 +188,7 @@
     </div>
 
     <div class="txn-line">
-        #{{ $invoice->invoice_number }} &nbsp; {{ $staffName }} &nbsp; {{ $invoiceDate }}
+        {{ $displayLabel }} #{{ $displayNumber }} &nbsp; {{ $staffName }} &nbsp; {{ $invoiceDate }}
     </div>
 
     <hr class="dash">
@@ -285,6 +292,8 @@
     /* ── Invoice data from PHP ── */
     const INVOICE_DATA = {
         invoiceNumber  : @json($invoice->invoice_number),
+        displayLabel   : @json($displayLabel),
+        displayNumber  : @json($displayNumber),
         invoiceDate    : @json($invoiceDate),
         staffName      : @json($staffName),
         customer       : @json($jsCustomer),
