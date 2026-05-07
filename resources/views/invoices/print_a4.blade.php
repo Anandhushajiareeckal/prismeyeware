@@ -288,7 +288,7 @@
             <!-- HEADER -->
             <div class="header">
                 <div class="logo-area">
-                    <img src="{{ asset('assets/img/logo/logo.jpg') }}" alt="Prism Eyewear" style="max-width: 160px; max-height: 80px; object-fit: contain; margin-bottom: 8px;">
+                    <img src="{{ asset('assets/img/logo/logo.jpg') }}" alt="Prism Eyewear" style="max-width: 220px; max-height: 110px; object-fit: contain; margin-bottom: 8px;">
                     <div class="company-sub">
                         GST No: 138-002-128<br>
                         Address: 6/100 Queens Road<br>
@@ -371,9 +371,10 @@
                 <thead>
                     <tr>
                         <th style="width:5%">#</th>
-                        <th style="width:45%">Item &amp; Description</th>
-                        <th class="text-center" style="width:12%">Qty</th>
-                        <th class="text-right" style="width:18%">Rate</th>
+                        <th style="width:35%">Item &amp; Description</th>
+                        <th class="text-center" style="width:15%">Date</th>
+                        <th class="text-center" style="width:10%">Qty</th>
+                        <th class="text-right" style="width:15%">Rate</th>
                         <th class="text-right" style="width:20%">Amount</th>
                     </tr>
                 </thead>
@@ -384,7 +385,9 @@
                         <td>
                             <span style="font-weight:600; color:#1a2b4a;">{{ $item->item_name }}</span>
                             @if($item->sku)<br><small style="color:#999;">SKU: {{ $item->sku }}</small>@endif
+                            @if($invoice->repair_id)<br><small style="color:#999;">Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }}</small>@elseif($invoice->order_id)<br><small style="color:#999;">Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }}</small>@endif
                         </td>
+                        <td class="text-center">{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</td>
                         <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
                         <td class="text-right">{{ number_format($item->rate, 2) }}</td>
                         <td class="text-right" style="font-weight:600;">{{ number_format($item->quantity * $item->rate, 2) }}</td>
@@ -434,20 +437,28 @@
 
             <!-- NOTES + FOOTER -->
             <div class="bottom-section">
-                <div class="notes-area">
+                <div style="flex:1;">
                     <div class="notes-label">Notes</div>
                     <div class="notes-text">
-                        @if($invoice->notes){{ $invoice->notes }}@else Prism Eyewear Repairs And Services
-Bank: ASB
-A/C No: 12-3297-0403694-00
-
-Thanks for your business.@endif
+@if($invoice->notes)
+{{ $invoice->notes }}
+@else
+No additional notes.
+@endif
                     </div>
                 </div>
-                <div class="thank-you">
-                    <strong>Thank you for your business!</strong>
-                    Please retain this invoice for your records.
+                <div style="flex:1; text-align:right;">
+                    <div style="font-weight:700; color:#1a2b4a; margin-bottom:8px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Payment Details</div>
+                    <div class="notes-text" style="text-align:right;">
+                        Prism Eyewear Repairs And Services<br>
+                        Bank: <strong>ASB</strong><br>
+                        A/C No: <strong>12-3297-0403694-00</strong>
+                    </div>
                 </div>
+            </div>
+            <div style="margin-top:30px; text-align:center; font-size:12px; color:#888;">
+                <strong style="display:block; color:#1a2b4a; font-size:13px; margin-bottom:2px;">Thank you for your business!</strong>
+                Please retain this invoice for your records.
             </div>
         </div>
     </div>

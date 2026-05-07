@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
-use App\Http\Requests\StoreInvoiceRequest;
-use App\Http\Requests\UpdateInvoiceRequest;
+use App\Models\Quote;
+use App\Http\Requests\StoreQuoteRequest;
+use App\Http\Requests\UpdateQuoteRequest;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Repair;
 
-class InvoiceController extends Controller
+class QuoteController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Invoice::with('customer');
+        $query = Quote::with('customer');
 
-        if ($request->filled('invoice_number')) {
-            $query->where('invoice_number', 'like', "%" . $request->invoice_number . "%");
+        if ($request->filled('quote_number')) {
+            $query->where('quote_number', 'like', "%" . $request->quote_number . "%");
         }
 
         if ($request->filled('date_from')) {
-            $query->whereDate('invoice_date', '>=', $request->date_from);
+            $query->whereDate('quote_date', '>=', $request->date_from);
         }
 
         if ($request->filled('date_to')) {
-            $query->whereDate('invoice_date', '<=', $request->date_to);
+            $query->whereDate('quote_date', '<=', $request->date_to);
         }
 
         if ($request->filled('customer_name')) {
@@ -39,12 +39,12 @@ class InvoiceController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('payment_status', $request->status);
+            $query->where('status', $request->status);
         }
 
-        $invoices = $query->latest('invoice_date')->paginate(15)->withQueryString();
+        $quotes = $query->latest('quote_date')->paginate(15)->withQueryString();
 
-        return view('invoices.index', compact('invoices'));
+        return view('quotes.index', compact('quotes'));
     }
 
     public function create(Request $request)
@@ -53,10 +53,10 @@ class InvoiceController extends Controller
         $customer = $customer_id ? Customer::find($customer_id) : null;
         $repair = $request->get('repair_id') ? Repair::with('items')->find($request->get('repair_id')) : null;
         $order = $request->get('order_id') ? Order::with('items')->find($request->get('order_id')) : null;
-        return view('invoices.create', compact('customer', 'repair', 'order'));
+        return view('quotes.create', compact('customer', 'repair', 'order'));
     }
 
-    public function store(StoreInvoiceRequest $request)
+    public function store(StoreQuoteRequest $request)
     {
         $data = $request->validated();
         
@@ -78,44 +78,39 @@ class InvoiceController extends Controller
         
         $totalAmount = $subtotal - $totalDiscount;
 
-        $invoice = Invoice::create([
-            'invoice_number' => 'INV-' . strtoupper(substr(uniqid(), -6)),
+        $quote = Quote::create([
+            'quote_number' => 'QT-' . strtoupper(substr(uniqid(), -6)),
             'customer_id' => $data['customer_id'],
             'order_id' => $data['order_id'] ?? null,
             'repair_id' => $data['repair_id'] ?? null,
-            'invoice_date' => $data['invoice_date'],
+            'quote_date' => $data['quote_date'],
             'subtotal' => $subtotal,
             'tax_amount' => $totalTax,
             'discount_amount' => $totalDiscount,
             'total_amount' => $totalAmount,
-            'payment_mode' => $data['payment_mode'] ?? null,
-            'payment_status' => $data['payment_status'],
+            'status' => $data['status'],
             'notes' => $data['notes'] ?? null,
             'staff_name' => $data['staff_name'] ?? null,
         ]);
 
-        $invoice->items()->createMany($data['items']);
+        $quote->items()->createMany($data['items']);
 
-        if ($invoice->order_id && $invoice->payment_status === 'Paid') {
-            Order::where('id', $invoice->order_id)->update(['order_status' => 'Completed']);
-        }
-
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice created successfully.');
+        return redirect()->route('quotes.show', $quote)->with('success', 'Quote created successfully.');
     }
 
-    public function show(Invoice $invoice)
+    public function show(Quote $quote)
     {
-        $invoice->load(['customer', 'items']);
-        return view('invoices.show', compact('invoice'));
+        $quote->load(['customer', 'items']);
+        return view('quotes.show', compact('quote'));
     }
 
-    public function edit(Invoice $invoice)
+    public function edit(Quote $quote)
     {
-        $invoice->load('items');
-        return view('invoices.edit', compact('invoice'));
+        $quote->load('items');
+        return view('quotes.edit', compact('quote'));
     }
 
-    public function update(UpdateInvoiceRequest $request, Invoice $invoice)
+    public function update(UpdateQuoteRequest $request, Quote $quote)
     {
         $data = $request->validated();
 
@@ -123,7 +118,7 @@ class InvoiceController extends Controller
         $totalTax = 0;
         $totalDiscount = 0;
         
-        $invoice->items()->delete();
+        $quote->items()->delete();
 
         foreach ($data['items'] as &$item) {
             $itemSubtotal = $item['rate'] * $item['quantity'];
@@ -139,38 +134,31 @@ class InvoiceController extends Controller
         
         $totalAmount = $subtotal - $totalDiscount;
 
-        $invoice->update([
-            'invoice_date' => $data['invoice_date'],
+        $quote->update([
+            'quote_date' => $data['quote_date'],
             'subtotal' => $subtotal,
             'tax_amount' => $totalTax,
             'discount_amount' => $totalDiscount,
             'total_amount' => $totalAmount,
-            'payment_mode' => $data['payment_mode'] ?? null,
-            'payment_status' => $data['payment_status'],
+            'status' => $data['status'],
             'notes' => $data['notes'] ?? null,
             'staff_name' => $data['staff_name'] ?? null,
         ]);
 
-        $invoice->items()->createMany($data['items']);
+        $quote->items()->createMany($data['items']);
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice updated successfully.');
+        return redirect()->route('quotes.show', $quote)->with('success', 'Quote updated successfully.');
     }
 
-    public function destroy(Invoice $invoice)
+    public function destroy(Quote $quote)
     {
-        $invoice->delete();
-        return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
+        $quote->delete();
+        return redirect()->route('quotes.index')->with('success', 'Quote deleted successfully.');
     }
 
-    public function printA4(Invoice $invoice)
+    public function printA4(Quote $quote)
     {
-        $invoice->load(['customer', 'items']);
-        return view('invoices.print_a4', compact('invoice'));
-    }
-
-    public function printThermal(Invoice $invoice)
-    {
-        $invoice->load(['customer', 'items', 'repair']);
-        return view('invoices.print_thermal', compact('invoice'));
+        $quote->load(['customer', 'items']);
+        return view('quotes.print_a4', compact('quote'));
     }
 }

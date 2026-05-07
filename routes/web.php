@@ -8,6 +8,7 @@ use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\RepairController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\CustomerNoteController;
 use App\Http\Controllers\CustomerDocumentController;
 
@@ -56,6 +57,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('orders', OrderController::class);
 
     // Finance
+    Route::get('quotes/{quote}/print/a4', [QuoteController::class, 'printA4'])->name('quotes.print.a4');
+    Route::resource('quotes', QuoteController::class);
+
     Route::get('invoices/{invoice}/print/a4',      [InvoiceController::class, 'printA4'])->name('invoices.print.a4');
     Route::get('invoices/{invoice}/print/thermal', [InvoiceController::class, 'printThermal'])->name('invoices.print.thermal');
     Route::resource('invoices', InvoiceController::class);

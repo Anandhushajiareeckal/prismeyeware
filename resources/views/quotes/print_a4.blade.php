@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consolidated Invoice</title>
+    <title>Quote {{ $quote->quote_number }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,8 +30,7 @@
             display: inline-block;
             margin: 0 6px;
         }
-        .btn-print-bar button.btn-primary { background: #1a6cdb; color: #fff; }
-        .btn-print-bar button.btn-secondary { background: #4a5b7d; color: #fff; }
+        .btn-print-bar button { background: #1a6cdb; color: #fff; }
         .btn-print-bar a { background: #fff; color: #333; border: 1px solid #ccc; }
 
         .page {
@@ -86,11 +85,25 @@
             margin-bottom: 30px;
         }
         .logo-area { display: flex; flex-direction: column; gap: 6px; }
+        .logo-icon {
+            font-size: 36px;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        /* SVG glasses logo */
+        .logo-svg { width: 56px; height: auto; margin-bottom: 4px; }
+        .company-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a2b4a;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
         .company-sub { font-size: 12px; color: #555; margin-top: 2px; line-height: 1.6; }
 
-        .invoice-label-area { text-align: right; }
-        .invoice-label {
-            font-size: 30px;
+        .quote-label-area { text-align: right; }
+        .quote-label {
+            font-size: 36px;
             font-weight: 700;
             color: #1a6cdb;
             letter-spacing: -0.5px;
@@ -102,6 +115,7 @@
             color: #555;
             margin-bottom: 16px;
         }
+        .inv-number strong { color: #222; }
         .balance-label {
             font-size: 11px;
             color: #888;
@@ -163,6 +177,7 @@
             font-weight: 600;
             letter-spacing: 0.3px;
         }
+        .items-table thead th:first-child { border-radius: 0; }
         .items-table tbody tr { border-bottom: 1px solid #eef1f6; }
         .items-table tbody tr:last-child { border-bottom: 2px solid #cdd5e0; }
         .items-table tbody td {
@@ -170,9 +185,11 @@
             color: #333;
             font-size: 12.5px;
         }
+        .items-table tfoot td { padding: 8px 14px; font-size: 13px; }
 
         .text-right { text-align: right; }
         .text-center { text-align: center; }
+
         .item-num { color: #888; font-size: 11px; }
 
         /* TOTALS */
@@ -252,7 +269,6 @@
                 max-width: 100%;
                 margin: 0;
                 padding: 30px 40px;
-                page-break-after: avoid;
             }
             @page { margin: 0.8cm; size: A4; }
         }
@@ -260,32 +276,9 @@
 </head>
 <body>
     <div class="btn-print-bar">
-        <button class="btn-primary" onclick="window.print()">🖨 Print / Save as PDF</button>
-        <button class="btn-secondary" onclick="window.close()">Close Tab</button>
+        <button onclick="window.print()">🖨 Print Quote</button>
+        <a href="{{ url()->previous() }}">← Back</a>
     </div>
-
-    @php
-        $customer = $invoices->first()->customer;
-        $consolidated_subtotal = 0;
-        $consolidated_tax = 0;
-        $consolidated_discount = 0;
-        $consolidated_total = 0;
-        $consolidated_balance = 0;
-        
-        foreach($invoices as $inv) {
-            $consolidated_subtotal += $inv->subtotal;
-            $consolidated_tax += $inv->tax_amount;
-            $consolidated_discount += $inv->discount_amount;
-            $consolidated_total += $inv->total_amount;
-            
-            $bal = $inv->payment_status === 'Paid' ? 0 : floatval($inv->total_amount);
-            $consolidated_balance += $bal;
-        }
-        
-        $isPaid = $consolidated_balance <= 0;
-        $statement_date = \Carbon\Carbon::now()->format('d M Y');
-        $invoice_numbers = $invoices->pluck('invoice_number')->implode(', ');
-    @endphp
 
     <div class="page">
         <div class="watermark"></div>
@@ -304,12 +297,12 @@
                     </div>
                 </div>
 
-                <div class="invoice-label-area">
-                    <div class="invoice-label">Consolidated Invoice</div>
-                    <div class="inv-number">Includes: {{ count($invoices) }} Invoice(s)</div>
-                    <div class="balance-label">Total Balance Due</div>
-                    <div class="balance-amount {{ $isPaid ? 'paid' : '' }}">
-                        NZD{{ number_format($consolidated_balance, 2) }}
+                <div class="quote-label-area">
+                    <div class="quote-label">Quote</div>
+                    <div class="inv-number"># {{ $quote->quote_number }}</div>
+                    <div class="balance-label">Total Amount</div>
+                    <div class="balance-amount">
+                        NZD{{ number_format($quote->total_amount, 2) }}
                     </div>
                 </div>
             </div>
@@ -320,12 +313,13 @@
             <div class="meta-row">
                 <div>
                     <div class="bill-to-label">Bill To</div>
-                    @if($customer)
+                    @if($quote->customer)
+                        <!-- <div class="bill-to-name">{{ $quote->customer->customer_number ?? $quote->customer->full_name }}</div> -->
                         <div class="bill-to-detail">
-                            {{ $customer->full_name }}<br>
-                            @if($customer->address){{ $customer->address }}<br>@endif
-                            @if($customer->phone)Phone: {{ $customer->phone }}<br>@endif
-                            @if($customer->email){{ $customer->email }}@endif
+                            {{ $quote->customer->full_name }}<br>
+                            @if($quote->customer->address){{ $quote->customer->address }}<br>@endif
+                            @if($quote->customer->phone)Phone: {{ $quote->customer->phone }}<br>@endif
+                            @if($quote->customer->email){{ $quote->customer->email }}@endif
                         </div>
                     @else
                         <div class="bill-to-name">Walk-in Customer</div>
@@ -335,13 +329,29 @@
                 <div>
                     <table class="dates-table">
                         <tr>
-                            <td>Statement Date :</td>
-                            <td>{{ $statement_date }}</td>
+                            <td>Quote Date :</td>
+                            <td>{{ \Carbon\Carbon::parse($quote->quote_date)->format('d M Y') }}</td>
                         </tr>
                         <tr>
                             <td>Terms :</td>
-                            <td>Due end of the month</td>
+                            <td>Valid for 30 days</td>
                         </tr>
+                        <tr>
+                            <td>Valid Until :</td>
+                            <td>{{ \Carbon\Carbon::parse($quote->quote_date)->addDays(30)->format('d M Y') }}</td>
+                        </tr>
+                        @if($quote->repair_id)
+                        <tr>
+                            <td>Ref Repair :</td>
+                            <td>#{{ $quote->repair?->repair_number ?? $quote->repair_id }}</td>
+                        </tr>
+                        @endif
+                        @if($quote->order_id)
+                        <tr>
+                            <td>Ref Order :</td>
+                            <td>{{ $quote->order?->order_number ?? '#' . $quote->order_id }}</td>
+                        </tr>
+                        @endif
                     </table>
                 </div>
             </div>
@@ -359,21 +369,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $itemIndex = 1; @endphp
-                    @foreach($invoices as $invoice)
-                        @foreach($invoice->items as $item)
-                        <tr>
-                            <td class="item-num">{{ $itemIndex++ }}</td>
-                            <td>
-                                <span style="font-weight:600; color:#1a2b4a;">{{ $item->item_name }}</span>
-                                <br><small style="color:#999;">Inv: {{ $invoice->invoice_number }} @if($item->sku) | SKU: {{ $item->sku }}@endif @if($invoice->repair_id) | Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} @elseif($invoice->order_id) | Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} @endif</small>
-                            </td>
-                            <td class="text-center">{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</td>
-                            <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
-                            <td class="text-right">{{ number_format($item->rate, 2) }}</td>
-                            <td class="text-right" style="font-weight:600;">{{ number_format($item->quantity * $item->rate, 2) }}</td>
-                        </tr>
-                        @endforeach
+                    @foreach($quote->items as $index => $item)
+                    <tr>
+                        <td class="item-num">{{ $index + 1 }}</td>
+                        <td>
+                            <span style="font-weight:600; color:#1a2b4a;">{{ $item->item_name }}</span>
+                            @if($item->sku)<br><small style="color:#999;">SKU: {{ $item->sku }}</small>@endif
+                            @if($quote->repair_id)<br><small style="color:#999;">Ref: #{{ $quote->repair?->repair_number ?? $quote->repair_id }}</small>@elseif($quote->order_id)<br><small style="color:#999;">Ref: {{ $quote->order?->order_number ?? '#'.$quote->order_id }}</small>@endif
+                        </td>
+                        <td class="text-center">{{ \Carbon\Carbon::parse($quote->quote_date)->format('d M Y') }}</td>
+                        <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
+                        <td class="text-right">{{ number_format($item->rate, 2) }}</td>
+                        <td class="text-right" style="font-weight:600;">{{ number_format($item->quantity * $item->rate, 2) }}</td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -385,33 +393,23 @@
                     <table>
                         <tr>
                             <td>Sub Total</td>
-                            <td>{{ number_format($consolidated_subtotal, 2) }}</td>
+                            <td>{{ number_format($quote->subtotal, 2) }}</td>
                         </tr>
-                        @if($consolidated_discount > 0)
+                        @if($quote->discount_amount > 0)
                         <tr class="row-discount">
                             <td>Discount</td>
-                            <td>(-) {{ number_format($consolidated_discount, 2) }}</td>
+                            <td>(-) {{ number_format($quote->discount_amount, 2) }}</td>
                         </tr>
                         @endif
-                        @if($consolidated_tax > 0)
+                        @if($quote->tax_amount > 0)
                         <tr>
                             <td>GST (Incl. 15%)</td>
-                            <td>{{ number_format($consolidated_tax, 2) }}</td>
+                            <td>{{ number_format($quote->tax_amount, 2) }}</td>
                         </tr>
                         @endif
                         <tr class="row-total">
                             <td>Total</td>
-                            <td>NZD{{ number_format($consolidated_total, 2) }}</td>
-                        </tr>
-                        @if($consolidated_total - $consolidated_balance > 0)
-                        <tr class="row-discount">
-                            <td>Payment Made</td>
-                            <td>(-) {{ number_format($consolidated_total - $consolidated_balance, 2) }}</td>
-                        </tr>
-                        @endif
-                        <tr class="row-balance">
-                            <td>Balance Due</td>
-                            <td>NZD{{ number_format($consolidated_balance, 2) }}</td>
+                            <td>NZD{{ number_format($quote->total_amount, 2) }}</td>
                         </tr>
                     </table>
                 </div>
@@ -422,7 +420,11 @@
                 <div style="flex:1;">
                     <div class="notes-label">Notes</div>
                     <div class="notes-text">
+@if($quote->notes)
+{{ $quote->notes }}
+@else
 No additional notes.
+@endif
                     </div>
                 </div>
                 <div style="flex:1; text-align:right;">
@@ -436,7 +438,7 @@ No additional notes.
             </div>
             <div style="margin-top:30px; text-align:center; font-size:12px; color:#888;">
                 <strong style="display:block; color:#1a2b4a; font-size:13px; margin-bottom:2px;">Thank you for your business!</strong>
-                Please retain this statement for your records.
+                Please retain this quote for your records.
             </div>
         </div>
     </div>

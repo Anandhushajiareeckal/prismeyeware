@@ -2,15 +2,15 @@
 
 @section('content')
 <div class="mb-4">
-    <a href="{{ $repair ? route('repairs.show', $repair) : ($order ? route('orders.show', $order) : route('invoices.index')) }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> {{ $repair ? 'Back to Repair #' . $repair->repair_number : ($order ? 'Back to Order ' . $order->order_number : 'Back to Invoices') }}</a>
-    <h3 class="page-title mt-2 mb-0">Create Invoice</h3>
+    <a href="{{ $repair ? route('repairs.show', $repair) : ($order ? route('orders.show', $order) : route('quotes.index')) }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> {{ $repair ? 'Back to Repair #' . $repair->repair_number : ($order ? 'Back to Order ' . $order->order_number : 'Back to Quotes') }}</a>
+    <h3 class="page-title mt-2 mb-0">Create Quote</h3>
 </div>
 
 @if($repair)
 <div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-3 mb-4" role="alert">
     <i class="bi bi-tools fs-4"></i>
     <div>
-        <strong>Generating invoice for Repair Job #{{ $repair->repair_number }}</strong><br>
+        <strong>Generating quote for Repair Job #{{ $repair->repair_number }}</strong><br>
         <span class="text-muted small">Items have been pre-filled from the repair. You can adjust them before saving.</span>
     </div>
 </div>
@@ -18,7 +18,7 @@
 <div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-3 mb-4" role="alert">
     <i class="bi bi-cart fs-4"></i>
     <div>
-        <strong>Generating invoice for Order {{ $order->order_number }}</strong><br>
+        <strong>Generating quote for Order {{ $order->order_number }}</strong><br>
         <span class="text-muted small">Items have been pre-filled from the order. You can adjust them before saving.</span>
     </div>
 </div>
@@ -26,7 +26,7 @@
 
 <div class="card shadow-sm border-0">
     <div class="card-body p-4 p-md-5">
-        <form action="{{ route('invoices.store') }}" method="POST" id="invoiceForm">
+        <form action="{{ route('quotes.store') }}" method="POST" id="quoteForm">
             @csrf
             
             <div class="row g-3 mb-4 border-bottom pb-4">
@@ -48,32 +48,23 @@
                     <input type="number" name="repair_id" class="form-control bg-light border-0" value="{{ request('repair_id') ?? old('repair_id') }}" placeholder="Repair ID">
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label fw-medium text-muted">Invoice Date <span class="text-danger">*</span></label>
-                    <input type="date" name="invoice_date" class="form-control bg-light border-0" value="{{ old('invoice_date', date('Y-m-d')) }}" required>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Quote Date <span class="text-danger">*</span></label>
+                    <input type="date" name="quote_date" class="form-control bg-light border-0" value="{{ old('quote_date', date('Y-m-d')) }}" required>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-medium text-muted">Payment Status <span class="text-danger">*</span></label>
-                    <select name="payment_status" class="form-select bg-light border-0" required>
-                        <option value="Unpaid" {{ old('payment_status') == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
-                        <option value="Partial" {{ old('payment_status') == 'Partial' ? 'selected' : '' }}>Partial</option>
-                        <option value="Paid" {{ old('payment_status') == 'Paid' ? 'selected' : '' }}>Paid</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-medium text-muted">Payment Mode</label>
-                    <select name="payment_mode" class="form-select bg-light border-0">
-                        <option value="">Select...</option>
-                        <option value="Cash" {{ old('payment_mode') == 'Cash' ? 'selected' : '' }}>Cash</option>
-                        <option value="Card" {{ old('payment_mode') == 'Card' ? 'selected' : '' }}>Card</option>
-                        <option value="Bank Transfer" {{ old('payment_mode') == 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer</option>
-                        <option value="Insurance" {{ old('payment_mode') == 'Insurance' ? 'selected' : '' }}>Insurance</option>
+                <div class="col-md-6">
+                    <label class="form-label fw-medium text-muted">Status <span class="text-danger">*</span></label>
+                    <select name="status" class="form-select bg-light border-0" required>
+                        <option value="Draft" {{ old('status') == 'Draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="Sent" {{ old('status') == 'Sent' ? 'selected' : '' }}>Sent</option>
+                        <option value="Accepted" {{ old('status') == 'Accepted' ? 'selected' : '' }}>Accepted</option>
+                        <option value="Rejected" {{ old('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
                     </select>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3 pt-2">
-                <h5 class="mb-0 text-primary fw-semibold">Invoice Items</h5>
+                <h5 class="mb-0 text-primary fw-semibold">Quote Items</h5>
                 <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" id="addItemBtn"><i class="bi bi-plus-lg"></i> Add Item</button>
             </div>
 
@@ -155,19 +146,19 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal:</span>
-                                <span class="fw-medium text-dark" id="invoiceSubtotal">$0.00</span>
+                                <span class="fw-medium text-dark" id="quoteSubtotal">$0.00</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Total Discount:</span>
-                                <span class="fw-medium text-danger" id="invoiceDiscount">-$0.00</span>
+                                <span class="fw-medium text-danger" id="quoteDiscount">-$0.00</span>
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <span class="text-muted">Total Tax:</span>
-                                <span class="fw-medium text-dark" id="invoiceTax">+$0.00</span>
+                                <span class="fw-medium text-dark" id="quoteTax">+$0.00</span>
                             </div>
                             <div class="d-flex justify-content-between border-top border-secondary pt-3">
                                 <span class="fw-bold fs-5 text-dark">Total Due:</span>
-                                <span class="fw-bold fs-4 text-success" id="invoiceTotal">$0.00</span>
+                                <span class="fw-bold fs-4 text-success" id="quoteTotal">$0.00</span>
                             </div>
                         </div>
                     </div>
@@ -175,8 +166,8 @@
             </div>
 
             <div class="text-end pt-3 border-top">
-                <a href="{{ route('invoices.index') }}" class="btn btn-light me-2 px-4">Cancel</a>
-                <button type="submit" class="btn btn-success px-4 shadow-sm"><i class="bi bi-check2-circle"></i> Save Invoice</button>
+                <a href="{{ route('quotes.index') }}" class="btn btn-light me-2 px-4">Cancel</a>
+                <button type="submit" class="btn btn-success px-4 shadow-sm"><i class="bi bi-check2-circle"></i> Save Quote</button>
             </div>
         </form>
     </div>
@@ -218,10 +209,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Total = subtotal - discount (tax is inclusive, no addition)
         const finalTotal = subtotal - totalDiscount;
         
-        document.getElementById('invoiceSubtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('invoiceDiscount').textContent = '-$' + totalDiscount.toFixed(2);
-        document.getElementById('invoiceTax').textContent = '$' + totalTax.toFixed(2) + ' (incl.)';
-        document.getElementById('invoiceTotal').textContent = '$' + finalTotal.toFixed(2);
+        document.getElementById('quoteSubtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('quoteDiscount').textContent = '-$' + totalDiscount.toFixed(2);
+        document.getElementById('quoteTax').textContent = '$' + totalTax.toFixed(2) + ' (incl.)';
+        document.getElementById('quoteTotal').textContent = '$' + finalTotal.toFixed(2);
         
         const rows = document.querySelectorAll('.item-row');
         rows.forEach(row => {

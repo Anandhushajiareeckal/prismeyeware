@@ -7,9 +7,7 @@
         <h3 class="page-title mt-2 mb-0">Order: {{ $order->order_number }}</h3>
     </div>
     <div>
-        @if($order->order_status !== 'Completed')
-            <a href="{{ route('invoices.create', ['customer_id' => $order->customer_id, 'order_id' => $order->id]) }}" class="btn btn-success me-2"><i class="bi bi-receipt"></i> Generate Invoice</a>
-        @endif
+        <a href="{{ route('invoices.create', ['customer_id' => $order->customer_id, 'order_id' => $order->id]) }}" class="btn btn-success me-2"><i class="bi bi-receipt"></i> Generate Invoice</a>
         <a href="{{ route('orders.edit', $order) }}" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit</a>
         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
             @csrf

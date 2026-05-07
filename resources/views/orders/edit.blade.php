@@ -1,9 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-4">
-    <a href="{{ route('orders.show', $order) }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Order</a>
-    <h3 class="page-title mt-2 mb-0">Edit Order: {{ $order->order_number }}</h3>
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <a href="{{ route('orders.show', $order) }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Order</a>
+        <h3 class="page-title mt-2 mb-0">Edit Order: {{ $order->order_number }}</h3>
+    </div>
+    <div>
+        <a href="{{ route('invoices.create', ['customer_id' => $order->customer_id, 'order_id' => $order->id]) }}" class="btn btn-success"><i class="bi bi-receipt"></i> Generate Invoice</a>
+    </div>
 </div>
 
 <div class="card shadow-sm border-0">

@@ -44,6 +44,7 @@
                 <li><a href="{{ route('repairs.index') }}" class="sidebar-link {{ request()->routeIs('repairs.*') ? 'active' : '' }}"><i class="bi bi-tools"></i> Repairs</a></li>
                 <li><a href="{{ route('orders.index') }}" class="sidebar-link {{ request()->routeIs('orders.*') ? 'active' : '' }}"><i class="bi bi-bag"></i> Orders</a></li>
                 <li class="mt-4 mb-2 px-3 text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 600;">Finance</li>
+                <li><a href="{{ route('quotes.index') }}" class="sidebar-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text"></i> Quotes</a></li>
                 <li><a href="{{ route('invoices.index') }}" class="sidebar-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}"><i class="bi bi-receipt"></i> Billing & Invoices</a></li>
                 <li><a href="{{ route('reports.index') }}" class="sidebar-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
                 
