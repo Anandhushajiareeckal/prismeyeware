@@ -109,9 +109,19 @@
                 </table>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label fw-medium text-muted">Repair Description & Notes</label>
-                <textarea name="repair_notes" rows="3" class="form-control bg-light border-0" placeholder="Describe the issue and required fixes...">{{ old('repair_notes') }}</textarea>
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <label class="form-label fw-medium text-muted">Repair Description & Notes</label>
+                    <textarea name="repair_notes" rows="3" class="form-control bg-light border-0" placeholder="Describe the issue and required fixes...">{{ old('repair_notes') }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-medium text-muted">Delivery Charge ($)</label>
+                    <input type="number" step="0.01" name="delivery_charge" id="delivery_charge" class="form-control bg-light border-0 text-end fw-medium" value="{{ old('delivery_charge', '0.00') }}" min="0">
+                    <div class="text-end mt-3">
+                        <span class="text-muted fw-medium">Grand Total: </span>
+                        <span class="fw-bold fs-4 text-primary" id="grandTotal">$0.00</span>
+                    </div>
+                </div>
             </div>
 
             <div class="text-end pt-3 mt-4 border-top">
@@ -134,13 +144,19 @@ document.addEventListener('DOMContentLoaded', function() {
             subtotal += price;
         });
         document.getElementById('repairTotal').textContent = '$' + subtotal.toFixed(2);
+        
+        const deliveryCharge = parseFloat(document.getElementById('delivery_charge').value) || 0;
+        const grandTotal = subtotal + deliveryCharge;
+        document.getElementById('grandTotal').textContent = '$' + grandTotal.toFixed(2);
+
         const rows = document.querySelectorAll('.item-row');
         rows.forEach(row => {
             row.querySelector('.remove-item').disabled = rows.length === 1;
         });
     }
 
-    const repairTypeOptions = {!! json_encode(\App\Models\RepairType::where('status','Active')->orderBy('name')->pluck('name')) !!};
+    const repairTypesData = {!! json_encode(\App\Models\RepairType::where('status','Active')->orderBy('name')->get()->keyBy('name')) !!};
+    const repairTypeOptions = Object.keys(repairTypesData);
 
     document.getElementById('addItemBtn').addEventListener('click', function() {
         let opts = '<option value="">— Select Repair Type —</option>';
@@ -166,6 +182,24 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotals();
         }
     });
+
+    itemsBody.addEventListener('change', function(e) {
+        if(e.target.classList.contains('repair-type')) {
+            const typeName = e.target.value;
+            if(typeName && repairTypesData[typeName]) {
+                const deliveryCharge = parseFloat(repairTypesData[typeName].delivery_charge) || 0;
+                // If there's already a delivery charge, maybe we shouldn't overwrite it if it's non-zero?
+                // Or maybe we should add it? 
+                // Let's just set it for now, as usually there's one main delivery charge.
+                if(deliveryCharge > 0) {
+                    document.getElementById('delivery_charge').value = deliveryCharge.toFixed(2);
+                    calculateTotals();
+                }
+            }
+        }
+    });
+
+    document.getElementById('delivery_charge').addEventListener('input', calculateTotals);
 
     itemsBody.addEventListener('click', function(e) {
         if(e.target.closest('.remove-item')) {

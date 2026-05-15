@@ -3,14 +3,14 @@
 @section('content')
 <div class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
     <div>
-        <a href="{{ route('customers.index') }}" class="text-decoration-none text-muted fw-medium"><i class="bi bi-arrow-left"></i> All Customers</a>
+        <a href="{{ route('shops.index') }}" class="text-decoration-none text-muted fw-medium"><i class="bi bi-arrow-left"></i> All Customers</a>
         <div class="d-flex align-items-center mt-2">
             <h3 class="page-title mb-0 me-3">{{ $customer->full_name }}</h3>
             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill">{{ $customer->customer_number }}</span>
         </div>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('customers.edit', $customer) }}" class="btn btn-light"><i class="bi bi-pencil"></i> Edit Profile</a>
+        <a href="{{ route('shops.edit', $customer) }}" class="btn btn-light"><i class="bi bi-pencil"></i> Edit Profile</a>
         <a href="{{ route('prescriptions.create', ['customer_id' => $customer->id]) }}" class="btn btn-primary"><i class="bi bi-file-medical"></i> Add Rx</a>
         <a href="{{ route('orders.create', ['customer_id' => $customer->id]) }}" class="btn btn-outline-primary"><i class="bi bi-bag-plus"></i> New Order</a>
     </div>
@@ -245,7 +245,7 @@
 
                     <!-- Cust Comms Tab -->
                     <div class="tab-pane fade" id="cust-comms">
-                        <form action="{{ route('customers.updateComments', $customer) }}" method="POST">
+                        <form action="{{ route('shops.updateComments', $customer) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">

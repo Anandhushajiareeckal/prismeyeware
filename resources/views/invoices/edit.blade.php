@@ -105,10 +105,18 @@
                                 <span class="text-muted">Total Discount:</span>
                                 <span class="fw-medium text-danger" id="invoiceDiscount">-$0.00</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Total Tax:</span>
                                 <span class="fw-medium text-dark" id="invoiceTax">+$0.00</span>
                             </div>
+                            @if($invoice->repair_id)
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Delivery Charge:</span>
+                                <input type="number" step="0.01" name="delivery_charge" id="delivery_charge" class="form-control form-control-sm bg-white border-1 text-end fw-medium" style="width: 100px;" value="{{ old('delivery_charge', number_format($invoice->delivery_charge ?? 0, 2, '.', '')) }}">
+                            </div>
+                            @else
+                            <input type="hidden" name="delivery_charge" id="delivery_charge" value="{{ $invoice->delivery_charge ?? 0 }}">
+                            @endif
                             <div class="d-flex justify-content-between border-top border-secondary pt-3">
                                 <span class="fw-bold fs-5 text-dark">Total Due:</span>
                                 <span class="fw-bold fs-4 text-success" id="invoiceTotal">$0.00</span>
@@ -143,10 +151,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const discount = parseFloat(row.querySelector('.discount').value) || 0;
             
             const lineSubtotal = qty * rate;
-            const tax = (lineSubtotal - discount) * 0.15;
+            const afterDiscount = lineSubtotal - discount;
+            // Inclusive tax: Tax is already inside the price
+            const tax = afterDiscount - (afterDiscount / 1.15);
             
             row.querySelector('.tax').value = tax.toFixed(2);
-            const lineTotal = lineSubtotal - discount + tax;
+            // Line total = after discount (tax is included)
+            const lineTotal = afterDiscount;
             
             row.querySelector('.line-total').textContent = lineTotal.toFixed(2);
             
@@ -155,11 +166,13 @@ document.addEventListener('DOMContentLoaded', function() {
             totalTax += tax;
         });
         
-        const finalTotal = subtotal - totalDiscount + totalTax;
+        // Total = subtotal - discount + delivery charge (tax is inclusive, no addition)
+        const deliveryCharge = parseFloat(document.getElementById('delivery_charge').value) || 0;
+        const finalTotal = (subtotal - totalDiscount) + deliveryCharge;
         
         document.getElementById('invoiceSubtotal').textContent = '$' + subtotal.toFixed(2);
         document.getElementById('invoiceDiscount').textContent = '-$' + totalDiscount.toFixed(2);
-        document.getElementById('invoiceTax').textContent = '+$' + totalTax.toFixed(2);
+        document.getElementById('invoiceTax').textContent = '$' + totalTax.toFixed(2) + ' (incl.)';
         document.getElementById('invoiceTotal').textContent = '$' + finalTotal.toFixed(2);
         
         const rows = document.querySelectorAll('.item-row');
@@ -195,6 +208,8 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotals();
         }
     });
+
+    document.getElementById('delivery_charge').addEventListener('input', calculateTotals);
 
     itemsBody.addEventListener('click', function(e) {
         if(e.target.closest('.remove-item')) {

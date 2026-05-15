@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="mb-4">
-    <a href="{{ route('customers.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Customers</a>
-    <h3 class="page-title mt-2 mb-0">New Customer</h3>
+    <a href="{{ route('shops.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Shops</a>
+    <h3 class="page-title mt-2 mb-0">New Shop</h3>
 </div>
 
 <div class="card">
     <div class="card-body p-4 p-md-5">
-        <form action="{{ route('customers.store') }}" method="POST">
+        <form action="{{ route('shops.store') }}" method="POST">
             @csrf
             
             <h5 class="mb-3 text-primary fw-semibold border-bottom pb-2">Personal Details</h5>
@@ -22,7 +22,7 @@
                     <input type="text" name="last_name" class="form-control bg-light border-0" value="{{ old('last_name') }}">
                 </div>
                 <div class="col-md-4">
-                    <input type="hidden" name="category" value="Customer">
+                    <input type="hidden" name="category" value="Shop">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">Gender</label>
@@ -84,7 +84,7 @@
             </div>
 
             <div class="text-end pt-3 mt-4">
-                <a href="{{ route('customers.index') }}" class="btn btn-light me-2 px-4">Cancel</a>
+                <a href="{{ route('shops.index') }}" class="btn btn-light me-2 px-4">Cancel</a>
                 <button type="submit" class="btn btn-primary px-4 shadow-sm">Save Customer</button>
             </div>
         </form>

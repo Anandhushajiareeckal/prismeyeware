@@ -39,6 +39,7 @@
                 <li><a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
                 <li class="mt-4 mb-2 px-3 text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 600;">CRM</li>
                 <li><a href="{{ route('customers.index') }}" class="sidebar-link {{ request()->routeIs('customers.*') ? 'active' : '' }}"><i class="bi bi-people"></i> Customers</a></li>
+                <li><a href="{{ route('shops.index') }}" class="sidebar-link {{ request()->routeIs('shops.*') ? 'active' : '' }}"><i class="bi bi-shop"></i> Shops</a></li>
                 <li><a href="{{ route('prescriptions.index') }}" class="sidebar-link {{ request()->routeIs('prescriptions.*') ? 'active' : '' }}"><i class="bi bi-file-medical"></i> Prescriptions</a></li>
                 <li class="mt-4 mb-2 px-3 text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 600;">Operations</li>
                 <li><a href="{{ route('repairs.index') }}" class="sidebar-link {{ request()->routeIs('repairs.*') ? 'active' : '' }}"><i class="bi bi-tools"></i> Repairs</a></li>
@@ -50,6 +51,7 @@
                 
                 <li class="nav-title mt-4 mb-2 small text-muted fw-bold text-uppercase px-2 tracking-wide">Settings</li>
                 <li><a href="{{ route('repair-types.index') }}" class="sidebar-link {{ request()->routeIs('repair-types.*') ? 'active' : '' }}"><i class="bi bi-tools"></i> Repair Types</a></li>
+                <li><a href="{{ route('prescription-types.index') }}" class="sidebar-link {{ request()->routeIs('prescription-types.*') ? 'active' : '' }}"><i class="bi bi-file-medical-fill"></i> Rx Types</a></li>
             </ul>
         </div>
 

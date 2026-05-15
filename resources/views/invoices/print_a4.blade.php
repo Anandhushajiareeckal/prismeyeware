@@ -237,8 +237,8 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-top: 30px;
-            padding-top: 24px;
+            margin-top: 20px;
+            padding-top: 16px;
             border-top: 1px solid #dde3ed;
             gap: 24px;
         }
@@ -249,16 +249,17 @@
             letter-spacing: 0.6px;
             color: #888;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-        .notes-text { font-size: 12px; color: #444; line-height: 1.7; white-space: pre-wrap; }
-        .thank-you {
-            text-align: right;
-            font-size: 12px;
-            color: #888;
-            align-self: flex-end;
+        .notes-text { font-size: 12px; color: #444; line-height: 1.6; white-space: pre-wrap; }
+        .payment-details-label {
+            font-weight: 700;
+            color: #1a2b4a;
+            margin-bottom: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
         }
-        .thank-you strong { display: block; font-size: 13px; color: #1a2b4a; margin-bottom: 2px; }
 
         @media print {
             body { background: #fff; margin: 0; padding: 0; }
@@ -417,6 +418,12 @@
                             <td>{{ number_format($invoice->tax_amount, 2) }}</td>
                         </tr>
                         @endif
+                        @if($invoice->repair_id && $invoice->delivery_charge > 0)
+                        <tr>
+                            <td>Delivery Charge</td>
+                            <td>{{ number_format($invoice->delivery_charge, 2) }}</td>
+                        </tr>
+                        @endif
                         <tr class="row-total">
                             <td>Total</td>
                             <td>NZD{{ number_format($invoice->total_amount, 2) }}</td>
@@ -438,22 +445,24 @@
             <!-- NOTES + FOOTER -->
             <div class="bottom-section">
                 <div style="flex:1;">
-                    <div class="notes-label">Notes</div>
-                    <div class="notes-text">
-@if($invoice->notes)
-{{ $invoice->notes }}
-@else
-No additional notes.
-@endif
-                    </div>
+                    @if($invoice->repair_id && $invoice->repair)
+                        @if($invoice->repair->repair_notes)
+                        <div class="notes-label">Repair Notes</div>
+                        <div class="notes-text" style="margin-bottom:10px;">{{ $invoice->repair->repair_notes }}</div>
+                        @endif
+                        @if($invoice->repair->assigned_staff)
+                        <div class="notes-label" style="margin-top:4px;">Assigned Staff</div>
+                        <div class="notes-text">{{ $invoice->repair->assigned_staff }}</div>
+                        @endif
+                    @endif
+                    @if($invoice->notes)
+                    <div class="notes-label" style="margin-top:{{ $invoice->repair_id ? '10px' : '0' }};">Notes</div>
+                    <div class="notes-text">{{ $invoice->notes }}</div>
+                    @endif
                 </div>
-                <div style="flex:1; text-align:right;">
-                    <div style="font-weight:700; color:#1a2b4a; margin-bottom:8px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Payment Details</div>
-                    <div class="notes-text" style="text-align:right;">
-                        Prism Eyewear Repairs And Services<br>
-                        Bank: <strong>ASB</strong><br>
-                        A/C No: <strong>12-3297-0403694-00</strong>
-                    </div>
+                <div style="flex:1; text-align:left; margin-left:255px;">
+                    <div class="payment-details-label" style="margin-bottom:5px;">Payment Details</div>
+                    <div class="notes-text" style="line-height:1.5; white-space:normal;">Prism Eyewear Repairs And Services<br>Bank: <strong>ASB</strong><br>A/C No: <strong>12-3297-0403694-00</strong></div>
                 </div>
             </div>
             <div style="margin-top:30px; text-align:center; font-size:12px; color:#888;">

@@ -9,7 +9,7 @@ class Repair extends Model
     protected $fillable = [
         'repair_number', 'customer_id', 'reference', 'sku', 'repair_date',
         'repair_notes', 'collection_notes', 'assigned_staff', 'repair_price',
-        'status', 'completion_date', 'collected_date', 'created_by'
+        'delivery_charge', 'status', 'completion_date', 'collected_date', 'created_by'
     ];
 
     public function customer() { return $this->belongsTo(Customer::class); }

@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class RepairType extends Model
 {
-    protected $fillable = ['name', 'status'];
+    protected $fillable = ['name', 'status', 'delivery_charge'];
 }

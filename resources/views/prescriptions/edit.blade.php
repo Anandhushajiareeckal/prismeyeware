@@ -25,11 +25,9 @@
                 <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">Type <span class="text-danger">*</span></label>
                     <select name="type" class="form-select bg-light border-0" required>
-                        <option value="Distance" {{ old('type', $prescription->type) == 'Distance' ? 'selected' : '' }}>Distance</option>
-                        <option value="Reading" {{ old('type', $prescription->type) == 'Reading' ? 'selected' : '' }}>Reading</option>
-                        <option value="Bifocal" {{ old('type', $prescription->type) == 'Bifocal' ? 'selected' : '' }}>Bifocal</option>
-                        <option value="Progressive" {{ old('type', $prescription->type) == 'Progressive' ? 'selected' : '' }}>Progressive</option>
-                        <option value="Contact Lens" {{ old('type', $prescription->type) == 'Contact Lens' ? 'selected' : '' }}>Contact Lens</option>
+                        @foreach($prescriptionTypes as $ptype)
+                            <option value="{{ $ptype->name }}" {{ old('type', $prescription->type) == $ptype->name ? 'selected' : '' }}>{{ $ptype->name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-4">

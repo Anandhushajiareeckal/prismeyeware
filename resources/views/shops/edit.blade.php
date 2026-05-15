@@ -3,19 +3,19 @@
 @section('content')
 <div class="mb-4 d-flex justify-content-between align-items-center">
     <div>
-        <a href="{{ route('customers.show', $customer) }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Profile</a>
-        <h3 class="page-title mt-2 mb-0">Edit Customer: {{ $customer->full_name }}</h3>
+        <a href="{{ route('shops.show', $customer) }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Profile</a>
+        <h3 class="page-title mt-2 mb-0">Edit Shop: {{ $customer->full_name }}</h3>
     </div>
-    <form action="{{ route('customers.convert', $customer) }}" method="POST">
+    <form action="{{ route('shops.convert', $customer) }}" method="POST">
         @csrf
         @method('PUT')
-        <button type="submit" class="btn btn-outline-secondary" onclick="return confirm('Change this customer into a Shop?');"><i class="bi bi-arrow-right-circle"></i> Convert to Shop</button>
+        <button type="submit" class="btn btn-outline-secondary" onclick="return confirm('Change this shop back into a Customer?');"><i class="bi bi-arrow-right-circle"></i> Convert to Customer</button>
     </form>
 </div>
 
 <div class="card">
     <div class="card-body p-4 p-md-5">
-        <form action="{{ route('customers.update', $customer) }}" method="POST">
+        <form action="{{ route('shops.update', $customer) }}" method="POST">
             @csrf
             @method('PUT')
             
@@ -30,7 +30,7 @@
                     <input type="text" name="last_name" class="form-control bg-light border-0" value="{{ old('last_name', $customer->last_name) }}">
                 </div>
                 <div class="col-md-4">
-                    <input type="hidden" name="category" value="Customer">
+                    <input type="hidden" name="category" value="Shop">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted fw-medium">Gender</label>
@@ -87,7 +87,7 @@
             </div>
 
             <div class="text-end pt-3 mt-4">
-                <a href="{{ route('customers.show', $customer) }}" class="btn btn-light me-2 px-4">Cancel</a>
+                <a href="{{ route('shops.show', $customer) }}" class="btn btn-light me-2 px-4">Cancel</a>
                 <button type="submit" class="btn btn-primary px-4 shadow-sm">Update Customer</button>
             </div>
         </form>

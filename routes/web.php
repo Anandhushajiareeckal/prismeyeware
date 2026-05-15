@@ -49,7 +49,13 @@ Route::middleware('auth')->group(function () {
 
     // CRM
     Route::put('customers/{customer}/comments', [CustomerController::class, 'updateComments'])->name('customers.updateComments');
+    Route::put('customers/{customer}/convert', [CustomerController::class, 'convertToShop'])->name('customers.convert');
     Route::resource('customers', CustomerController::class);
+    
+    Route::put('shops/{shop}/comments', [\App\Http\Controllers\ShopController::class, 'updateComments'])->name('shops.updateComments');
+    Route::put('shops/{shop}/convert', [\App\Http\Controllers\ShopController::class, 'convertToCustomer'])->name('shops.convert');
+    Route::resource('shops', \App\Http\Controllers\ShopController::class);
+
     Route::resource('prescriptions', PrescriptionController::class);
 
     // Operations
@@ -70,12 +76,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/print', [App\Http\Controllers\ReportController::class, 'printSelected'])->name('reports.print');
     Route::get('/reports/customer/{customer}', [App\Http\Controllers\ReportController::class, 'customer'])->name('reports.customer');
 
+    // Report Downloads (CSV)
+    Route::get('/reports/download/invoice/{invoice}', [App\Http\Controllers\ReportDownloadController::class, 'downloadSingle'])->name('reports.download.single');
+    Route::get('/reports/download/bulk', [App\Http\Controllers\ReportDownloadController::class, 'downloadBulk'])->name('reports.download.bulk');
+    Route::get('/reports/download/customer/{customer}/all', [App\Http\Controllers\ReportDownloadController::class, 'downloadCustomerAll'])->name('reports.download.customer.all');
+
     // Misc
     Route::post('customer-notes',     [CustomerNoteController::class, 'store'])->name('customer-notes.store');
     Route::post('customer-documents', [CustomerDocumentController::class, 'store'])->name('customer-documents.store');
 
     Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
     Route::resource('repair-types', \App\Http\Controllers\RepairTypeController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('prescription-types', \App\Http\Controllers\PrescriptionTypeController::class)->only(['index', 'store', 'destroy']);
 
     // QZ Tray — serve certificate (via route, not static file, to bypass ad blockers)
     Route::get('/qz-cert', function () {

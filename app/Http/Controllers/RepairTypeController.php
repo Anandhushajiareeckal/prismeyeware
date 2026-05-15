@@ -18,11 +18,13 @@ class RepairTypeController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:repair_types,name',
             'status' => 'nullable|string|in:Active,Inactive',
+            'delivery_charge' => 'nullable|numeric|min:0',
         ]);
 
         RepairType::create([
             'name' => $request->name,
             'status' => $request->status ?? 'Active',
+            'delivery_charge' => $request->delivery_charge ?? 0,
         ]);
 
         return redirect()->route('repair-types.index')->with('success', 'Repair type added successfully.');

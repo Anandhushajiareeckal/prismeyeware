@@ -122,6 +122,7 @@ function dashLine(char = '-') {
  * @param {number} data.subtotal
  * @param {number} data.taxAmount
  * @param {number} data.discountAmount
+ * @param {number} data.deliveryCharge
  * @param {number} data.totalAmount
  * @param {string|null} data.paymentMode
  * @param {string|null} data.notes
@@ -216,6 +217,9 @@ function buildReceipt(data) {
     }
     if (data.discountAmount > 0) {
         r += twoColLine('Discount', '-$' + Number(data.discountAmount).toFixed(2));
+    }
+    if (data.deliveryCharge > 0) {
+        r += twoColLine('Delivery', '+$' + Number(data.deliveryCharge).toFixed(2));
     }
 
     // Grand Total — bold + double-height

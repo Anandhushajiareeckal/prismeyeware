@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
-
 use Illuminate\Http\Request;
 
-class CustomerController extends Controller
+class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Customer::where('category', '!=', 'Shop'); // or 'Customer' or default null
+        $query = Customer::where('category', 'Shop');
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -24,12 +23,12 @@ class CustomerController extends Controller
             });
         }
         $customers = $query->latest()->paginate(15);
-        return view('customers.index', compact('customers'));
+        return view('shops.index', compact('customers'));
     }
 
     public function create()
     {
-        return view('customers.create');
+        return view('shops.create');
     }
 
     public function store(StoreCustomerRequest $request)
@@ -46,50 +45,52 @@ class CustomerController extends Controller
         
         $data['customer_number'] = sprintf('%05d', $nextCustomerId);
         $data['created_by'] = auth()->id();
-        $data['category'] = 'Customer';
+        $data['category'] = 'Shop';
 
         $customer = Customer::create($data);
 
-        return redirect()->route('customers.show', $customer)->with('success', 'Customer created successfully.');
+        return redirect()->route('shops.show', $customer)->with('success', 'Shop created successfully.');
     }
 
-    public function show(Customer $customer)
+    public function show(Customer $shop) // model binding still Customer
     {
-        $customer->load(['prescriptions', 'repairs', 'orders', 'invoices', 'notes.user', 'documents']);
-        return view('customers.show', compact('customer'));
+        $shop->load(['prescriptions', 'repairs', 'orders', 'invoices', 'notes.user', 'documents']);
+        // Pass it to the view as customer to minimize view changes, but we will rename variable in view? 
+        // Let's pass as 'customer' so view code works without renaming variables inside.
+        return view('shops.show', ['customer' => $shop]);
     }
 
-    public function edit(Customer $customer)
+    public function edit(Customer $shop)
     {
-        return view('customers.edit', compact('customer'));
+        return view('shops.edit', ['customer' => $shop]);
     }
 
-    public function update(UpdateCustomerRequest $request, Customer $customer)
+    public function update(UpdateCustomerRequest $request, Customer $shop)
     {
         $data = $request->validated();
         $data['updated_by'] = auth()->id();
-        $data['category'] = 'Customer';
-        $customer->update($data);
+        $data['category'] = 'Shop';
+        $shop->update($data);
 
-        return redirect()->route('customers.show', $customer)->with('success', 'Customer updated successfully.');
+        return redirect()->route('shops.show', $shop)->with('success', 'Shop updated successfully.');
     }
 
-    public function updateComments(Request $request, Customer $customer)
+    public function updateComments(Request $request, Customer $shop)
     {
-        $customer->cust_comms = $request->cust_comms;
-        $customer->save();
+        $shop->cust_comms = $request->cust_comms;
+        $shop->save();
         return redirect()->back()->with('success', 'Comments updated successfully.');
     }
 
-    public function convertToShop(Customer $customer)
+    public function convertToCustomer(Customer $shop)
     {
-        $customer->update(['category' => 'Shop']);
-        return redirect()->route('shops.show', $customer)->with('success', 'Successfully moved to Shops.');
+        $shop->update(['category' => 'Customer']);
+        return redirect()->route('customers.show', $shop)->with('success', 'Successfully moved to Customers.');
     }
 
-    public function destroy(Customer $customer)
+    public function destroy(Customer $shop)
     {
-        $customer->delete();
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
+        $shop->delete();
+        return redirect()->route('shops.index')->with('success', 'Shop deleted successfully.');
     }
 }

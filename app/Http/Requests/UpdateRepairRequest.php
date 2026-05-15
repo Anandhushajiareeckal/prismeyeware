@@ -30,6 +30,7 @@ class UpdateRepairRequest extends FormRequest
             'status' => 'nullable|string|in:Pending,In Progress,Completed,Collected,Cancelled',
             'completion_date' => 'nullable|date',
             'collected_date' => 'nullable|date',
+            'delivery_charge' => 'nullable|numeric|min:0',
         ];
     }
 }

@@ -76,7 +76,7 @@ class InvoiceController extends Controller
             $totalDiscount += ($item['discount'] ?? 0);
         }
         
-        $totalAmount = $subtotal - $totalDiscount;
+        $totalAmount = ($subtotal - $totalDiscount) + ($data['delivery_charge'] ?? 0);
 
         $invoice = Invoice::create([
             'invoice_number' => 'INV-' . strtoupper(substr(uniqid(), -6)),
@@ -87,6 +87,7 @@ class InvoiceController extends Controller
             'subtotal' => $subtotal,
             'tax_amount' => $totalTax,
             'discount_amount' => $totalDiscount,
+            'delivery_charge' => $data['delivery_charge'] ?? 0,
             'total_amount' => $totalAmount,
             'payment_mode' => $data['payment_mode'] ?? null,
             'payment_status' => $data['payment_status'],
@@ -137,13 +138,14 @@ class InvoiceController extends Controller
             $totalDiscount += ($item['discount'] ?? 0);
         }
         
-        $totalAmount = $subtotal - $totalDiscount;
+        $totalAmount = ($subtotal - $totalDiscount) + ($data['delivery_charge'] ?? 0);
 
         $invoice->update([
             'invoice_date' => $data['invoice_date'],
             'subtotal' => $subtotal,
             'tax_amount' => $totalTax,
             'discount_amount' => $totalDiscount,
+            'delivery_charge' => $data['delivery_charge'] ?? 0,
             'total_amount' => $totalAmount,
             'payment_mode' => $data['payment_mode'] ?? null,
             'payment_status' => $data['payment_status'],

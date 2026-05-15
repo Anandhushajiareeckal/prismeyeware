@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="page-title mb-0">Customers</h3>
-    <a href="{{ route('customers.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Customer</a>
+    <h3 class="page-title mb-0">Shops</h3>
+    <a href="{{ route('shops.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Shop</a>
 </div>
 
 <div class="card">
@@ -25,7 +25,7 @@
                     <tr>
                         <td class="fw-medium text-muted">{{ $customer->customer_number }}</td>
                         <td>
-                            <a href="{{ route('customers.show', $customer) }}" class="text-decoration-none fw-medium text-dark">
+                            <a href="{{ route('shops.show', $customer) }}" class="text-decoration-none fw-medium text-dark">
                                 {{ $customer->full_name }}
                             </a>
                             @if(($customer->category ?? 'Customer') === 'Shop')
@@ -36,9 +36,9 @@
                         <td>{{ $customer->email ?? '-' }}</td>
                         <td>{{ $customer->created_at->format('M d, Y') }}</td>
                         <td class="text-end">
-                            <a href="{{ route('customers.show', $customer) }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a>
-                            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
-                            <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete {{ addslashes($customer->full_name) }}? This cannot be undone.');">
+                            <a href="{{ route('shops.show', $customer) }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a>
+                            <a href="{{ route('shops.edit', $customer) }}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+                            <form action="{{ route('shops.destroy', $customer) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete {{ addslashes($customer->full_name) }}? This cannot be undone.');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
@@ -46,7 +46,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center py-4 text-muted">No customers found.</td></tr>
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No shops found.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -161,10 +161,18 @@
                                 <span class="text-muted">Total Discount:</span>
                                 <span class="fw-medium text-danger" id="invoiceDiscount">-$0.00</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Total Tax:</span>
                                 <span class="fw-medium text-dark" id="invoiceTax">+$0.00</span>
                             </div>
+                            @if($repair || request('repair_id'))
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Delivery Charge:</span>
+                                <input type="number" step="0.01" name="delivery_charge" id="delivery_charge" class="form-control form-control-sm bg-white border-1 text-end fw-medium" style="width: 100px;" value="{{ old('delivery_charge', $repair ? number_format($repair->delivery_charge ?? 0, 2, '.', '') : '0.00') }}">
+                            </div>
+                            @else
+                            <input type="hidden" name="delivery_charge" id="delivery_charge" value="0.00">
+                            @endif
                             <div class="d-flex justify-content-between border-top border-secondary pt-3">
                                 <span class="fw-bold fs-5 text-dark">Total Due:</span>
                                 <span class="fw-bold fs-4 text-success" id="invoiceTotal">$0.00</span>
@@ -215,8 +223,9 @@ document.addEventListener('DOMContentLoaded', function() {
             totalTax += tax;
         });
         
-        // Total = subtotal - discount (tax is inclusive, no addition)
-        const finalTotal = subtotal - totalDiscount;
+        // Total = subtotal - discount + delivery charge (tax is inclusive, no addition)
+        const deliveryCharge = parseFloat(document.getElementById('delivery_charge').value) || 0;
+        const finalTotal = (subtotal - totalDiscount) + deliveryCharge;
         
         document.getElementById('invoiceSubtotal').textContent = '$' + subtotal.toFixed(2);
         document.getElementById('invoiceDiscount').textContent = '-$' + totalDiscount.toFixed(2);
@@ -256,6 +265,8 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateTotals();
         }
     });
+
+    document.getElementById('delivery_charge').addEventListener('input', calculateTotals);
 
     itemsBody.addEventListener('click', function(e) {
         if(e.target.closest('.remove-item')) {

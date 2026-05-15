@@ -26,6 +26,7 @@ class StoreInvoiceRequest extends FormRequest
             'payment_status' => 'required|string',
             'notes' => 'nullable|string',
             'staff_name' => 'nullable|string',
+            'delivery_charge' => 'nullable|numeric|min:0',
             'items' => 'required|array|min:1',
             'items.*.item_name' => 'required|string|max:255',
             'items.*.sku' => 'nullable|string|max:255',

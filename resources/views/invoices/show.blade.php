@@ -9,6 +9,7 @@
     <div class="d-flex gap-2">
         <a href="{{ route('invoices.print.a4', $invoice) }}" target="_blank" class="btn btn-outline-primary"><i class="bi bi-printer"></i> Print A4</a>
         <a href="{{ route('invoices.print.thermal', $invoice) }}" target="_blank" class="btn btn-outline-secondary"><i class="bi bi-receipt"></i> Print Thermal</a>
+        <a href="{{ route('reports.download.single', $invoice) }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
         <a href="{{ route('invoices.edit', $invoice) }}" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit</a>
         <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" onsubmit="return confirm('Delete this invoice?');">
             @csrf
@@ -101,7 +102,7 @@
                                 <td class="text-end">${{ number_format($item->rate, 2) }}</td>
                                 <td class="text-end text-danger">{{ $item->discount > 0 ? '-$'.number_format($item->discount, 2) : '-' }}</td>
                                 <td class="text-end">{{ $item->tax > 0 ? '$'.number_format($item->tax, 2) : '-' }}</td>
-                                <td class="text-end pe-4 fw-bold text-dark">${{ number_format(($item->quantity * $item->rate) - $item->discount + $item->tax, 2) }}</td>
+                                <td class="text-end pe-4 fw-bold text-dark">${{ number_format(($item->quantity * $item->rate) - $item->discount, 2) }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -119,10 +120,16 @@
                             <span>Total Discount</span>
                             <span>-${{ number_format($invoice->discount_amount, 2) }}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3 text-muted">
-                            <span>Total Tax</span>
-                            <span>+${{ number_format($invoice->tax_amount, 2) }}</span>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Total Tax (Incl. 15%)</span>
+                            <span class="fw-medium text-dark">${{ number_format($invoice->tax_amount, 2) }}</span>
                         </div>
+                        @if($invoice->repair_id && $invoice->delivery_charge > 0)
+                        <div class="d-flex justify-content-between mb-3 text-muted">
+                            <span>Delivery Charge</span>
+                            <span class="fw-medium text-dark">+${{ number_format($invoice->delivery_charge ?? 0, 2) }}</span>
+                        </div>
+                        @endif
                         <div class="d-flex justify-content-between border-top border-secondary pt-3">
                             <span class="fw-bold fs-5 text-dark">Total Due</span>
                             <span class="fw-bold fs-4 text-primary">${{ number_format($invoice->total_amount, 2) }}</span>

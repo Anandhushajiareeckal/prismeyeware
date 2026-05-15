@@ -30,7 +30,8 @@ class PrescriptionController extends Controller
     {
         $customer_id = $request->get('customer_id');
         $customer = $customer_id ? Customer::find($customer_id) : null;
-        return view('prescriptions.create', compact('customer'));
+        $prescriptionTypes = \App\Models\PrescriptionType::where('status', 'Active')->orderBy('name')->get();
+        return view('prescriptions.create', compact('customer', 'prescriptionTypes'));
     }
 
     public function store(StorePrescriptionRequest $request)
@@ -52,7 +53,8 @@ class PrescriptionController extends Controller
 
     public function edit(Prescription $prescription)
     {
-        return view('prescriptions.edit', compact('prescription'));
+        $prescriptionTypes = \App\Models\PrescriptionType::where('status', 'Active')->orderBy('name')->get();
+        return view('prescriptions.edit', compact('prescription', 'prescriptionTypes'));
     }
 
     public function update(UpdatePrescriptionRequest $request, Prescription $prescription)

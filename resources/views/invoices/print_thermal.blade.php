@@ -129,7 +129,8 @@
     $subtotal       = floatval($invoice->subtotal       ?? 0);
     $taxAmount      = floatval($invoice->tax_amount     ?? 0);
     $discountAmount = floatval($invoice->discount_amount ?? 0);
-    $totalAmount    = floatval($invoice->total_amount   ?? ($subtotal - $discountAmount));
+    $deliveryCharge = $invoice->repair_id ? floatval($invoice->delivery_charge ?? 0) : 0;
+    $totalAmount    = floatval($invoice->total_amount   ?? (($subtotal - $discountAmount) + $deliveryCharge));
 
     $customer    = $invoice->customer;
     $staffName   = $invoice->staff_name  ?? 'Staff';
@@ -251,6 +252,12 @@
             <td class="amt">-${{ number_format($discountAmount, 2) }}</td>
         </tr>
         @endif
+        @if($deliveryCharge > 0)
+        <tr>
+            <td class="lbl">Delivery</td>
+            <td class="amt">+${{ number_format($deliveryCharge, 2) }}</td>
+        </tr>
+        @endif
     </table>
 
     <hr class="dash-solid">
@@ -301,6 +308,7 @@
         subtotal       : @json($subtotal),
         taxAmount      : @json($taxAmount),
         discountAmount : @json($discountAmount),
+        deliveryCharge : @json($deliveryCharge),
         totalAmount    : @json($totalAmount),
         paymentMode    : @json($paymentMode),
         notes          : @json($invoice->notes ?? null),

@@ -115,8 +115,16 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-light border-top">
-                                <td class="text-end fw-bold text-dark pt-3 pb-3">Total Estimated Cost:</td>
-                                <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3">${{ number_format($repair->repair_price, 2) }}</td>
+                                <td class="text-end fw-bold text-dark pt-3 pb-1">Subtotal Estimated Cost:</td>
+                                <td class="text-end fw-bold text-dark pt-3 pb-1">${{ number_format($repair->repair_price, 2) }}</td>
+                            </tr>
+                            <tr class="bg-light">
+                                <td class="text-end fw-bold text-dark pt-1 pb-1">Delivery Charge:</td>
+                                <td class="text-end fw-bold text-dark pt-1 pb-1">${{ number_format($repair->delivery_charge ?? 0, 2) }}</td>
+                            </tr>
+                            <tr class="bg-light">
+                                <td class="text-end fw-bold text-primary pt-1 pb-3 fs-5">Grand Total:</td>
+                                <td class="text-end fw-bold text-primary pt-1 pb-3 fs-5">${{ number_format(($repair->repair_price + ($repair->delivery_charge ?? 0)), 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>
