@@ -10,7 +10,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Customer::query();
+        $query = Customer::where('category', 'Shop');
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;

@@ -79,7 +79,7 @@ class QuoteController extends Controller
         $totalAmount = $subtotal - $totalDiscount;
 
         $quote = Quote::create([
-            'quote_number' => 'QT-' . strtoupper(substr(uniqid(), -6)),
+            'quote_number' => str_pad((Quote::max('id') ?? 0) + 1, 6, '0', STR_PAD_LEFT),
             'customer_id' => $data['customer_id'],
             'order_id' => $data['order_id'] ?? null,
             'repair_id' => $data['repair_id'] ?? null,

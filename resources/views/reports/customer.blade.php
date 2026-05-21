@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-4 d-flex justify-content-between align-items-center">
     <div>
-        <a href="{{ route('reports.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Customers</a>
+        <a href="{{ route('reports.index') }}" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Shops</a>
         <h3 class="page-title mt-2 mb-0">Report: {{ $customer->full_name }}</h3>
     </div>
     <div class="d-flex gap-2">
@@ -29,10 +29,7 @@
                 <label class="form-label small text-muted fw-bold">Date To</label>
                 <input type="date" name="date_to" class="form-control border-0" value="{{ request('date_to') }}">
             </div>
-            <div class="col-md-2">
-                <label class="form-label small text-muted fw-bold">Invoice #</label>
-                <input type="text" name="invoice_number" class="form-control border-0" value="{{ request('invoice_number') }}" placeholder="e.g. INV-123">
-            </div>
+
             <div class="col-md-2">
                 <label class="form-label small text-muted fw-bold">Reference #</label>
                 <input type="text" name="reference" class="form-control border-0" value="{{ request('reference') }}" placeholder="Order/Repair No.">
@@ -94,7 +91,7 @@
                     <tr>
                         <th class="border-bottom-0 ps-4" style="width: 40px;"></th>
                         <th class="border-bottom-0">Date</th>
-                        <th class="border-bottom-0">Invoice #</th>
+
                         <th class="border-bottom-0">Reference</th>
                         <th class="border-bottom-0 text-end">Amount</th>
                         <th class="border-bottom-0 text-center">Status</th>
@@ -110,9 +107,7 @@
                             </div>
                         </td>
                         <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('M d, Y') }}</td>
-                        <td>
-                            <a href="{{ route('invoices.show', $invoice) }}" class="text-decoration-none small text-muted">{{ $invoice->invoice_number }}</a>
-                        </td>
+
                         <td>
                             @if($invoice->repair_id)
                                 @if($invoice->repair->reference)

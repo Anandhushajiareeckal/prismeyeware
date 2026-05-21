@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RepairItem extends Model
 {
-    protected $fillable = ['repair_id', 'repair_type', 'price'];
+    protected $fillable = ['repair_id', 'repair_type', 'price', 'item_type'];
 
     public function repair() 
     { 

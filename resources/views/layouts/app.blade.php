@@ -51,7 +51,7 @@
                 
                 <li class="nav-title mt-4 mb-2 small text-muted fw-bold text-uppercase px-2 tracking-wide">Settings</li>
                 <li><a href="{{ route('repair-types.index') }}" class="sidebar-link {{ request()->routeIs('repair-types.*') ? 'active' : '' }}"><i class="bi bi-tools"></i> Repair Types</a></li>
-                <li><a href="{{ route('prescription-types.index') }}" class="sidebar-link {{ request()->routeIs('prescription-types.*') ? 'active' : '' }}"><i class="bi bi-file-medical-fill"></i> Rx Types</a></li>
+                <li><a href="{{ route('prescription-types.index') }}" class="sidebar-link {{ request()->routeIs('prescription-types.*') ? 'active' : '' }}"><i class="bi bi-file-medical-fill"></i> Lens</a></li>
             </ul>
         </div>
 

@@ -109,6 +109,33 @@
                 </table>
             </div>
 
+            <div class="d-flex justify-content-between align-items-center mb-3 pt-4 border-top">
+                <h5 class="mb-0 fw-semibold text-primary">Lenses</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" id="addLensBtn"><i class="bi bi-plus-lg"></i> Add Lens</button>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle" id="lensesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 70%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0">Lens Type / Name</th>
+                            <th style="width: 25%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0 text-end">Cost ($)</th>
+                            <th style="width: 5%" class="border-bottom-0"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lensesBody">
+                        {{-- Lens rows will be added via JS --}}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="text-end fw-bold pt-3 pb-3">Lenses Subtotal:</td>
+                            <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3" id="lensesTotal">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
             <div class="row g-3 mb-4">
                 <div class="col-md-8">
                     <label class="form-label fw-medium text-muted">Repair Description & Notes</label>
@@ -135,28 +162,38 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let itemIndex = 1;
+    let lensIndex = 0;
     const itemsBody = document.getElementById('itemsBody');
+    const lensesBody = document.getElementById('lensesBody');
 
     function calculateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.item-row').forEach(row => {
+        let repairSubtotal = 0;
+        document.querySelectorAll('#itemsBody .item-row').forEach(row => {
             const price = parseFloat(row.querySelector('.price').value) || 0;
-            subtotal += price;
+            repairSubtotal += price;
         });
-        document.getElementById('repairTotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('repairTotal').textContent = '$' + repairSubtotal.toFixed(2);
+
+        let lensesSubtotal = 0;
+        document.querySelectorAll('#lensesBody .lens-row').forEach(row => {
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            lensesSubtotal += price;
+        });
+        document.getElementById('lensesTotal').textContent = '$' + lensesSubtotal.toFixed(2);
         
         const deliveryCharge = parseFloat(document.getElementById('delivery_charge').value) || 0;
-        const grandTotal = subtotal + deliveryCharge;
+        const grandTotal = repairSubtotal + lensesSubtotal + deliveryCharge;
         document.getElementById('grandTotal').textContent = '$' + grandTotal.toFixed(2);
 
-        const rows = document.querySelectorAll('.item-row');
-        rows.forEach(row => {
-            row.querySelector('.remove-item').disabled = rows.length === 1;
+        const repairRows = document.querySelectorAll('#itemsBody .item-row');
+        repairRows.forEach(row => {
+            row.querySelector('.remove-item').disabled = repairRows.length === 1;
         });
     }
 
     const repairTypesData = {!! json_encode(\App\Models\RepairType::where('status','Active')->orderBy('name')->get()->keyBy('name')) !!};
     const repairTypeOptions = Object.keys(repairTypesData);
+    const prescriptionTypes = {!! json_encode($prescriptionTypes) !!};
 
     document.getElementById('addItemBtn').addEventListener('click', function() {
         let opts = '<option value="">— Select Repair Type —</option>';
@@ -177,7 +214,26 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateTotals();
     });
 
-    itemsBody.addEventListener('input', function(e) {
+    document.getElementById('addLensBtn').addEventListener('click', function() {
+        let opts = '<option value="">— Select Lens —</option>';
+        prescriptionTypes.forEach(pt => { opts += `<option value="${pt.name}">${pt.name}</option>`; });
+        const tr = document.createElement('tr');
+        tr.className = 'lens-row';
+        tr.innerHTML = `
+            <td>
+                <select name="lenses[${lensIndex}][lens_type]" class="form-select bg-light border-0" required>${opts}</select>
+            </td>
+            <td><input type="number" step="0.01" name="lenses[${lensIndex}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0" required></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-light text-danger remove-lens rounded-circle"><i class="bi bi-x-lg"></i></button>
+            </td>
+        `;
+        lensesBody.appendChild(tr);
+        lensIndex++;
+        calculateTotals();
+    });
+
+    document.addEventListener('input', function(e) {
         if(e.target.classList.contains('price')) {
             calculateTotals();
         }
@@ -188,9 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const typeName = e.target.value;
             if(typeName && repairTypesData[typeName]) {
                 const deliveryCharge = parseFloat(repairTypesData[typeName].delivery_charge) || 0;
-                // If there's already a delivery charge, maybe we shouldn't overwrite it if it's non-zero?
-                // Or maybe we should add it? 
-                // Let's just set it for now, as usually there's one main delivery charge.
                 if(deliveryCharge > 0) {
                     document.getElementById('delivery_charge').value = deliveryCharge.toFixed(2);
                     calculateTotals();
@@ -201,13 +254,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('delivery_charge').addEventListener('input', calculateTotals);
 
-    itemsBody.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
         if(e.target.closest('.remove-item')) {
             const btn = e.target.closest('.remove-item');
             if(!btn.disabled) {
                 btn.closest('tr').remove();
                 calculateTotals();
             }
+        }
+        if(e.target.closest('.remove-lens')) {
+            e.target.closest('tr').remove();
+            calculateTotals();
         }
     });
 

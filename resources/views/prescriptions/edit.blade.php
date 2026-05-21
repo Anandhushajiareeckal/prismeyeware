@@ -51,7 +51,8 @@
                             <th>AXIS</th>
                             <th>PRISM (H)</th>
                             <th>PRISM (V)</th>
-                            <th>ADD</th>
+                            <th>N-ADD</th>
+                            <th>I-ADD</th>
                             <th>PD</th>
                             <th>FH</th>
                         </tr>
@@ -64,7 +65,8 @@
                             <td><input type="text" name="od_axis" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_axis', $prescription->od_axis) }}"></td>
                             <td><input type="text" name="od_h_prism" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_h_prism', $prescription->od_h_prism) }}"></td>
                             <td><input type="text" name="od_v_prism" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_v_prism', $prescription->od_v_prism) }}"></td>
-                            <td><input type="text" name="od_add" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_add', $prescription->od_add) }}"></td>
+                            <td><input type="text" name="od_n_add" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_n_add', $prescription->od_n_add) }}"></td>
+                            <td><input type="text" name="od_i_add" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_i_add', $prescription->od_i_add) }}"></td>
                             <td><input type="text" name="od_pd" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_pd', $prescription->od_pd) }}"></td>
                             <td><input type="text" name="od_fh" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('od_fh', $prescription->od_fh) }}"></td>
                         </tr>
@@ -75,7 +77,8 @@
                             <td><input type="text" name="os_axis" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_axis', $prescription->os_axis) }}"></td>
                             <td><input type="text" name="os_h_prism" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_h_prism', $prescription->os_h_prism) }}"></td>
                             <td><input type="text" name="os_v_prism" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_v_prism', $prescription->os_v_prism) }}"></td>
-                            <td><input type="text" name="os_add" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_add', $prescription->os_add) }}"></td>
+                            <td><input type="text" name="os_n_add" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_n_add', $prescription->os_n_add) }}"></td>
+                            <td><input type="text" name="os_i_add" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_i_add', $prescription->os_i_add) }}"></td>
                             <td><input type="text" name="os_pd" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_pd', $prescription->os_pd) }}"></td>
                             <td><input type="text" name="os_fh" class="form-control text-center bg-light border-0 fw-medium" value="{{ old('os_fh', $prescription->os_fh) }}"></td>
                         </tr>

@@ -366,7 +366,7 @@
                             <td class="item-num">{{ $itemIndex++ }}</td>
                             <td>
                                 <span style="font-weight:600; color:#1a2b4a;">{{ $item->item_name }}</span>
-                                <br><small style="color:#999;">Inv: {{ $invoice->invoice_number }} @if($item->sku) | SKU: {{ $item->sku }}@endif @if($invoice->repair_id) | Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} @elseif($invoice->order_id) | Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} @endif</small>
+                                <br><small style="color:#999;">@if($item->sku)SKU: {{ $item->sku }}@endif @if($invoice->repair_id) | Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} @elseif($invoice->order_id) | Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} @endif</small>
                             </td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</td>
                             <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
@@ -427,11 +427,7 @@ No additional notes.
                 </div>
                 <div style="flex:1; text-align:right;">
                     <div style="font-weight:700; color:#1a2b4a; margin-bottom:8px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Payment Details</div>
-                    <div class="notes-text" style="text-align:right;">
-                        Prism Eyewear Repairs And Services<br>
-                        Bank: <strong>ASB</strong><br>
-                        A/C No: <strong>12-3297-0403694-00</strong>
-                    </div>
+                    <div class="notes-text" style="line-height:1.5; white-space:normal;">PRISM EYEWEAR REPAIRS AND SERVICES LIMITED<br>Bank: <strong>ASB</strong><br>A/C No: <strong>12-3287-0403694-00</strong></div>
                 </div>
             </div>
             <div style="margin-top:30px; text-align:center; font-size:12px; color:#888;">

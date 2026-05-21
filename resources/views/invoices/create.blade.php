@@ -67,6 +67,7 @@
                         <option value="Cash" {{ old('payment_mode') == 'Cash' ? 'selected' : '' }}>Cash</option>
                         <option value="Card" {{ old('payment_mode') == 'Card' ? 'selected' : '' }}>Card</option>
                         <option value="Bank Transfer" {{ old('payment_mode') == 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                        <option value="Bank Remittance" {{ old('payment_mode') == 'Bank Remittance' ? 'selected' : '' }}>Bank Remittance</option>
                         <option value="Insurance" {{ old('payment_mode') == 'Insurance' ? 'selected' : '' }}>Insurance</option>
                     </select>
                 </div>

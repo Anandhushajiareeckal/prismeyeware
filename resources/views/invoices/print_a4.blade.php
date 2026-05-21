@@ -300,7 +300,7 @@
 
                 <div class="invoice-label-area">
                     <div class="invoice-label">Tax Invoice</div>
-                    <div class="inv-number"># Tax Inv-{{ $invoice->invoice_number }}</div>
+                    <div class="inv-number"></div>
                     <div class="balance-label">Balance Due</div>
                     @php
                         $balanceDue = $invoice->payment_status === 'Paid' ? 0 : floatval($invoice->total_amount);
@@ -399,7 +399,12 @@
 
             <!-- TOTALS + NOTES -->
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:6px; gap:20px;">
-                <div style="flex:1;"></div>
+                <div style="flex:1;">
+                    @if($invoice->repair_id && $invoice->repair && $invoice->repair->repair_notes)
+                        <div class="notes-label">Repair Notes</div>
+                        <div class="notes-text" style="margin-bottom:10px;">{{ $invoice->repair->repair_notes }}</div>
+                    @endif
+                </div>
                 <div class="totals-box">
                     <table>
                         <tr>
@@ -442,27 +447,21 @@
                 </div>
             </div>
 
-            <!-- NOTES + FOOTER -->
+            <!-- FOOTER -->
             <div class="bottom-section">
                 <div style="flex:1;">
-                    @if($invoice->repair_id && $invoice->repair)
-                        @if($invoice->repair->repair_notes)
-                        <div class="notes-label">Repair Notes</div>
-                        <div class="notes-text" style="margin-bottom:10px;">{{ $invoice->repair->repair_notes }}</div>
-                        @endif
-                        @if($invoice->repair->assigned_staff)
-                        <div class="notes-label" style="margin-top:4px;">Assigned Staff</div>
+                    @if($invoice->repair_id && $invoice->repair && $invoice->repair->assigned_staff)
+                        <div class="notes-label">Assigned Staff</div>
                         <div class="notes-text">{{ $invoice->repair->assigned_staff }}</div>
-                        @endif
                     @endif
                     @if($invoice->notes)
-                    <div class="notes-label" style="margin-top:{{ $invoice->repair_id ? '10px' : '0' }};">Notes</div>
+                    <div class="notes-label" style="margin-top:{{ ($invoice->repair_id && $invoice->repair && $invoice->repair->assigned_staff) ? '10px' : '0' }};">Notes</div>
                     <div class="notes-text">{{ $invoice->notes }}</div>
                     @endif
                 </div>
                 <div style="flex:1; text-align:left; margin-left:255px;">
                     <div class="payment-details-label" style="margin-bottom:5px;">Payment Details</div>
-                    <div class="notes-text" style="line-height:1.5; white-space:normal;">Prism Eyewear Repairs And Services<br>Bank: <strong>ASB</strong><br>A/C No: <strong>12-3297-0403694-00</strong></div>
+                    <div class="notes-text" style="line-height:1.5; white-space:normal;">PRISM EYEWEAR REPAIRS AND SERVICES LIMITED<br>Bank: <strong>ASB</strong><br>A/C No: <strong>12-3287-0403694-00</strong></div>
                 </div>
             </div>
             <div style="margin-top:30px; text-align:center; font-size:12px; color:#888;">

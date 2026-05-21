@@ -79,7 +79,7 @@ class InvoiceController extends Controller
         $totalAmount = ($subtotal - $totalDiscount) + ($data['delivery_charge'] ?? 0);
 
         $invoice = Invoice::create([
-            'invoice_number' => 'INV-' . strtoupper(substr(uniqid(), -6)),
+            'invoice_number' => str_pad((Invoice::max('id') ?? 0) + 1, 6, '0', STR_PAD_LEFT),
             'customer_id' => $data['customer_id'],
             'order_id' => $data['order_id'] ?? null,
             'repair_id' => $data['repair_id'] ?? null,

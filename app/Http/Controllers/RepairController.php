@@ -31,7 +31,8 @@ class RepairController extends Controller
     {
         $customer_id = $request->get('customer_id');
         $customer = $customer_id ? Customer::find($customer_id) : null;
-        return view('repairs.create', compact('customer'));
+        $prescriptionTypes = \App\Models\PrescriptionType::where('status', 'Active')->orderBy('name')->get();
+        return view('repairs.create', compact('customer', 'prescriptionTypes'));
     }
 
     public function store(StoreRepairRequest $request)
@@ -53,10 +54,34 @@ class RepairController extends Controller
         foreach($data['items'] as $item) {
             $repair_price += ($item['price'] ?? 0);
         }
+        if (!empty($data['lenses'])) {
+            foreach($data['lenses'] as $lens) {
+                $repair_price += ($lens['price'] ?? 0);
+            }
+        }
         $data['repair_price'] = $repair_price;
 
         $repair = Repair::create($data);
-        $repair->items()->createMany($data['items']);
+        
+        // Save Repair Items
+        foreach($data['items'] as $item) {
+            $repair->items()->create([
+                'repair_type' => $item['repair_type'],
+                'price' => $item['price'] ?? 0,
+                'item_type' => 'Repair'
+            ]);
+        }
+        
+        // Save Lens Items
+        if (!empty($data['lenses'])) {
+            foreach($data['lenses'] as $lens) {
+                $repair->items()->create([
+                    'repair_type' => $lens['lens_type'],
+                    'price' => $lens['price'] ?? 0,
+                    'item_type' => 'Lens'
+                ]);
+            }
+        }
 
         foreach($data['items'] as $item) {
             if (!empty($item['repair_type'])) {
@@ -75,7 +100,8 @@ class RepairController extends Controller
 
     public function edit(Repair $repair)
     {
-        return view('repairs.edit', compact('repair'));
+        $prescriptionTypes = \App\Models\PrescriptionType::where('status', 'Active')->orderBy('name')->get();
+        return view('repairs.edit', compact('repair', 'prescriptionTypes'));
     }
 
     public function update(UpdateRepairRequest $request, Repair $repair)
@@ -86,12 +112,36 @@ class RepairController extends Controller
         foreach($data['items'] as $item) {
             $repair_price += ($item['price'] ?? 0);
         }
+        if (!empty($data['lenses'])) {
+            foreach($data['lenses'] as $lens) {
+                $repair_price += ($lens['price'] ?? 0);
+            }
+        }
         $data['repair_price'] = $repair_price;
 
         $repair->update($data);
         
         $repair->items()->delete();
-        $repair->items()->createMany($data['items']);
+        
+        // Save Repair Items
+        foreach($data['items'] as $item) {
+            $repair->items()->create([
+                'repair_type' => $item['repair_type'],
+                'price' => $item['price'] ?? 0,
+                'item_type' => 'Repair'
+            ]);
+        }
+        
+        // Save Lens Items
+        if (!empty($data['lenses'])) {
+            foreach($data['lenses'] as $lens) {
+                $repair->items()->create([
+                    'repair_type' => $lens['lens_type'],
+                    'price' => $lens['price'] ?? 0,
+                    'item_type' => 'Lens'
+                ]);
+            }
+        }
         
         foreach($data['items'] as $item) {
             if (!empty($item['repair_type'])) {

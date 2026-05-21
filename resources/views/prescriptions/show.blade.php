@@ -63,7 +63,8 @@
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">AXIS</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">PRISM (H)</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">PRISM (V)</th>
-                                <th class="text-muted small fw-bold tracking-wide border-bottom-0">ADD</th>
+                                <th class="text-muted small fw-bold tracking-wide border-bottom-0">N-ADD</th>
+                                <th class="text-muted small fw-bold tracking-wide border-bottom-0">I-ADD</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">PD</th>
                                 <th class="text-muted small fw-bold tracking-wide border-bottom-0">FH</th>
                             </tr>
@@ -76,7 +77,8 @@
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_axis ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_h_prism ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_v_prism ?: '-' }}</td>
-                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_add ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_n_add ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_i_add ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_pd ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->od_fh ?: '-' }}</td>
                             </tr>
@@ -87,7 +89,8 @@
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_axis ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_h_prism ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_v_prism ?: '-' }}</td>
-                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_add ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_n_add ?: '-' }}</td>
+                                <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_i_add ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_pd ?: '-' }}</td>
                                 <td class="fs-5 fw-medium text-dark py-3">{{ $prescription->os_fh ?: '-' }}</td>
                             </tr>

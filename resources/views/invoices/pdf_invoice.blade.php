@@ -101,7 +101,7 @@
             </td>
             <td width="40%" valign="top" style="text-align: right;">
                 <div class="invoice-label">Tax Invoice</div>
-                <div class="inv-number"># Tax Inv-{{ $invoice->invoice_number }}</div>
+                <div class="inv-number"></div>
                 
                 @php
                     $balanceDue = $invoice->payment_status === 'Paid' ? 0 : floatval($invoice->total_amount);
@@ -188,7 +188,12 @@
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 15px;">
             <tr>
                 <!-- 55% Empty Left Column -->
-                <td width="55%"></td>
+                <td width="55%" valign="top" style="padding-right: 20px;">
+                    @if($invoice->repair && $invoice->repair->repair_notes)
+                        <div class="footer-label">Repair Notes</div>
+                        <div class="footer-text" style="margin-bottom: 10px;">{{ $invoice->repair->repair_notes }}</div>
+                    @endif
+                </td>
                 
                 <!-- 45% Right Column for Totals -->
                 <td width="45%">
@@ -229,12 +234,8 @@
         {{-- FOOTER --}}
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px; border-top: 1px solid #dde3ed; padding-top: 20px;">
             <tr>
-                <!-- 55% Left Column for Notes -->
+                <!-- 55% Empty Left Column -->
                 <td width="55%" valign="top" style="padding-right: 20px;">
-                    @if($invoice->repair && $invoice->repair->repair_notes)
-                        <div class="footer-label">Repair Notes</div>
-                        <div class="footer-text" style="margin-bottom: 10px;">{{ $invoice->repair->repair_notes }}</div>
-                    @endif
                     @if($invoice->notes)
                         <div class="footer-label">Notes</div>
                         <div class="footer-text">{{ $invoice->notes }}</div>
@@ -245,9 +246,9 @@
                 <td width="45%" valign="top" style="text-align: left;margin-left:255px; ">
                     <div class="footer-label" style="color: #1a2b4a;">Payment Details</div>
                     <div class="footer-text" style="line-height: 1.6;">
-                        Prism Eyewear Repairs And Services<br>
+                        PRISM EYEWEAR REPAIRS AND SERVICES LIMITED<br>
                         Bank: <strong>ASB</strong><br>
-                        A/C No: <strong>12-3297-0403694-00</strong>
+                        A/C No: <strong>12-3287-0403694-00</strong>
                     </div>
                 </td>
             </tr>

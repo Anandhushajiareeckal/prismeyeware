@@ -133,10 +133,11 @@
     $totalAmount    = floatval($invoice->total_amount   ?? (($subtotal - $discountAmount) + $deliveryCharge));
 
     $customer    = $invoice->customer;
-    $staffName   = $invoice->staff_name  ?? 'Staff';
+    $staffName   = $invoice->staff_name ?: (optional($invoice->repair)->assigned_staff ?: 'Staff');
     $paymentMode = $invoice->payment_mode ?? null;
     $invoiceDate = \Carbon\Carbon::parse($invoice->created_at ?? $invoice->invoice_date)->format('d-M-Y H:i');
     $jobDesc     = optional($invoice->repair)->job_description;
+    $invoiceNotes = $invoice->notes ?: optional($invoice->repair)->repair_notes;
 
     // Pre-built for @json() — avoids Blade parse errors with closures/arrays inside @json()
     $jsCustomer = $customer ? [
@@ -207,7 +208,6 @@
     <div class="cst-name">WALK-IN CUSTOMER</div>
     @endif
 
-    <hr class="dash">
 
     @if($jobDesc)
     <div class="job-type">{{ $jobDesc }}</div>
@@ -228,7 +228,6 @@
         @endforeach
     </table>
 
-    <hr class="dash">
 
     <table class="totals-table">
         <tr class="row-total-bold">
@@ -236,8 +235,6 @@
             <td class="amt">${{ number_format($totalAmount, 2) }}</td>
         </tr>
     </table>
-
-    <hr class="dash">
 
     <table class="totals-table">
         @if($taxAmount > 0)
@@ -273,13 +270,12 @@
     <div class="pay-mode">Paid by: {{ $paymentMode }}</div>
     @endif
 
-    @if($invoice->notes)
+    @if($invoiceNotes)
     <div class="note-block">
-        <span class="note-label">Note: </span>{!! nl2br(e($invoice->notes)) !!}
+        <span class="note-label">Note: </span>{!! nl2br(e($invoiceNotes)) !!}
     </div>
     @endif
 
-    <hr class="dash">
 
     <div class="footer">
         <div class="thankyou">Thank You!</div>
@@ -311,7 +307,7 @@
         deliveryCharge : @json($deliveryCharge),
         totalAmount    : @json($totalAmount),
         paymentMode    : @json($paymentMode),
-        notes          : @json($invoice->notes ?? null),
+        notes          : @json($invoiceNotes ?? null),
         jobDescription : @json($jobDesc ?? null),
     };
 

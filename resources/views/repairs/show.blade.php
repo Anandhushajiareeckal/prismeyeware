@@ -95,7 +95,8 @@
                     <table class="table table-bordered table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th class="text-muted text-uppercase small">Repair Type</th>
+                                <th class="text-muted text-uppercase small">Category</th>
+                                <th class="text-muted text-uppercase small">Type / Name</th>
                                 <th class="text-end text-muted text-uppercase small">Amount ($)</th>
                             </tr>
                         </thead>
@@ -103,27 +104,32 @@
                             @if($repair->items && $repair->items->count() > 0)
                                 @foreach($repair->items as $item)
                                 <tr>
+                                    <td>
+                                        <span class="badge bg-{{ $item->item_type == 'Repair' ? 'info' : 'primary' }}-subtle text-{{ $item->item_type == 'Repair' ? 'info' : 'primary' }} border border-{{ $item->item_type == 'Repair' ? 'info' : 'primary' }}-subtle px-2 py-1 rounded small">
+                                            {{ $item->item_type }}
+                                        </span>
+                                    </td>
                                     <td class="fw-medium text-dark">{{ $item->repair_type }}</td>
                                     <td class="text-end fw-medium text-success">${{ number_format($item->price, 2) }}</td>
                                 </tr>
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="2" class="text-center text-muted py-3">No repair types defined.</td>
+                                    <td colspan="3" class="text-center text-muted py-3">No repair or lens items defined.</td>
                                 </tr>
                             @endif
                         </tbody>
                         <tfoot>
                             <tr class="bg-light border-top">
-                                <td class="text-end fw-bold text-dark pt-3 pb-1">Subtotal Estimated Cost:</td>
+                                <td colspan="2" class="text-end fw-bold text-dark pt-3 pb-1">Subtotal Estimated Cost:</td>
                                 <td class="text-end fw-bold text-dark pt-3 pb-1">${{ number_format($repair->repair_price, 2) }}</td>
                             </tr>
                             <tr class="bg-light">
-                                <td class="text-end fw-bold text-dark pt-1 pb-1">Delivery Charge:</td>
+                                <td colspan="2" class="text-end fw-bold text-dark pt-1 pb-1">Delivery Charge:</td>
                                 <td class="text-end fw-bold text-dark pt-1 pb-1">${{ number_format($repair->delivery_charge ?? 0, 2) }}</td>
                             </tr>
                             <tr class="bg-light">
-                                <td class="text-end fw-bold text-primary pt-1 pb-3 fs-5">Grand Total:</td>
+                                <td colspan="2" class="text-end fw-bold text-primary pt-1 pb-3 fs-5">Grand Total:</td>
                                 <td class="text-end fw-bold text-primary pt-1 pb-3 fs-5">${{ number_format(($repair->repair_price + ($repair->delivery_charge ?? 0)), 2) }}</td>
                             </tr>
                         </tfoot>

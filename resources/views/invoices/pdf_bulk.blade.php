@@ -186,10 +186,9 @@
                     <td>
                         <div class="item-name">{{ $item->item_name }}</div>
                         <div class="item-sku">
-                            Inv: {{ $invoice->invoice_number }} 
-                            @if($item->sku) | SKU: {{ $item->sku }} @endif 
-                            @if($invoice->repair_id) | Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} 
-                            @elseif($invoice->order_id) | Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} 
+                            @if($item->sku)SKU: {{ $item->sku }} @endif 
+                            @if($invoice->repair_id) @if($item->sku) | @endif Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} 
+                            @elseif($invoice->order_id) @if($item->sku) | @endif Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} 
                             @endif
                         </div>
                     </td>
@@ -265,9 +264,9 @@
                 <td width="45%" valign="top" style="text-align: left;margin-left:255px;">
                     <div class="footer-label" style="color: #1a2b4a;">Payment Details</div>
                     <div class="footer-text" style="line-height: 1.6;">
-                        Prism Eyewear Repairs And Services<br>
+                        PRISM EYEWEAR REPAIRS AND SERVICES LIMITED<br>
                         Bank: <strong>ASB</strong><br>
-                        A/C No: <strong>12-3297-0403694-00</strong>
+                        A/C No: <strong>12-3287-0403694-00</strong>
                     </div>
                 </td>
             </tr>

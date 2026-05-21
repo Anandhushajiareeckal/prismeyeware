@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Customer Reports')
+@section('title', 'Shop Reports')
 
 @section('content')
 <div class="mb-4 d-flex justify-content-between align-items-center">
-    <h3 class="page-title mb-0">Customer Reports</h3>
+    <h3 class="page-title mb-0">Shop Reports</h3>
 </div>
 
 <div class="card shadow-sm border-0 mb-4">
@@ -12,7 +12,7 @@
         <form action="{{ route('reports.index') }}" method="GET" class="row g-2 align-items-center">
             <div class="col-md-5 position-relative">
                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" name="search" class="form-control bg-white border-0 ps-5" placeholder="Search by name, phone, or customer number..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control bg-white border-0 ps-5" placeholder="Search by name, phone, or shop number..." value="{{ request('search') }}">
             </div>
             <div class="col-md-auto">
                 <button type="submit" class="btn btn-primary px-4">Search</button>
@@ -28,7 +28,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="border-bottom-0 ps-4">Customer</th>
+                        <th class="border-bottom-0 ps-4">Shop</th>
                         <th class="border-bottom-0">Phone</th>
                         <th class="border-bottom-0">Email</th>
                         <th class="text-end border-bottom-0 pe-4">Action</th>
@@ -55,7 +55,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="4" class="text-center py-5 text-muted">No customers found matching your criteria.</td></tr>
+                    <tr><td colspan="4" class="text-center py-5 text-muted">No shops found matching your criteria.</td></tr>
                     @endforelse
                 </tbody>
             </table>

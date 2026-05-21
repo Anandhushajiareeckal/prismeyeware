@@ -7,6 +7,9 @@
         <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#repairTypesPanel">
             <i class="bi bi-tools me-1"></i> Repair Types
         </button>
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#lensPanel">
+            <i class="bi bi-layers me-1"></i> Lens
+        </button>
         <a href="{{ route('repairs.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Repair</a>
     </div>
 </div>
@@ -149,12 +152,80 @@
     </div>
 </div>
 
+{{-- Lens (Prescription Types) Offcanvas Panel --}}
+<div class="offcanvas offcanvas-end" tabindex="-1" id="lensPanel" style="width: 420px;">
+    <div class="offcanvas-header border-bottom py-3">
+        <h5 class="offcanvas-title fw-semibold text-primary"><i class="bi bi-layers me-2"></i>Lens Management</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0 d-flex flex-column">
+
+        {{-- Add Form --}}
+        <div class="p-4 border-bottom bg-light">
+            <p class="text-muted small mb-3">Add new lens types that will appear as options when creating repair jobs and prescriptions.</p>
+            <form action="{{ route('prescription-types.store') }}" method="POST">
+                @csrf
+                <div class="row g-2 align-items-end">
+                    <div class="col-6">
+                        <label class="form-label text-muted fw-medium small mb-1">Lens Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control form-control-sm bg-white shadow-sm border-0" placeholder="e.g., Single Vision..." required>
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label text-muted fw-medium small mb-1">Status</label>
+                        <select name="status" class="form-select form-select-sm bg-white shadow-sm border-0">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- Lens List --}}
+        <div class="flex-grow-1 overflow-auto">
+            @php $lensTypes = \App\Models\PrescriptionType::orderBy('name')->get(); @endphp
+            @if($lensTypes->count())
+            <ul class="list-group list-group-flush">
+                @foreach($lensTypes as $type)
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+                    <div>
+                        <span class="fw-medium text-dark">{{ $type->name }}</span>
+                        <span class="ms-2 badge {{ $type->status === 'Active' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle' }} rounded-pill px-2 small">
+                            {{ $type->status ?? 'Active' }}
+                        </span>
+                    </div>
+                    <form action="{{ route('prescription-types.destroy', $type) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this lens type?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-light text-danger rounded-circle border-0"><i class="bi bi-trash"></i></button>
+                    </form>
+                </li>
+                @endforeach
+            </ul>
+            @else
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-layers fs-1 opacity-25 d-block mb-3"></i>
+                <span class="small">No lens types configured yet.</span>
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     // Re-open offcanvas if we just came back from a successful form submit
     @if(session('success') && str_contains(url()->previous(), 'repair-types'))
         document.addEventListener('DOMContentLoaded', function() {
             new bootstrap.Offcanvas(document.getElementById('repairTypesPanel')).show();
+        });
+    @endif
+    @if(session('success') && str_contains(url()->previous(), 'prescription-types'))
+        document.addEventListener('DOMContentLoaded', function() {
+            new bootstrap.Offcanvas(document.getElementById('lensPanel')).show();
         });
     @endif
 </script>

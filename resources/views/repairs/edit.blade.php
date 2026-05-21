@@ -58,6 +58,11 @@
                 </div>
             </div>
 
+            @php
+                $repairItems = $repair->items->where('item_type', 'Repair');
+                $lensItems = $repair->items->where('item_type', 'Lens');
+            @endphp
+
             <div class="d-flex justify-content-between align-items-center mb-3 pt-2">
                 <h5 class="mb-0 fw-semibold text-primary">Repair Types</h5>
                 <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" id="addItemBtn"><i class="bi bi-plus-lg"></i> Add Repair Type</button>
@@ -73,8 +78,8 @@
                         </tr>
                     </thead>
                     <tbody id="itemsBody">
-                        @if($repair->items && $repair->items->count())
-                            @foreach($repair->items as $index => $item)
+                        @if($repairItems->count())
+                            @foreach($repairItems as $index => $item)
                             <tr class="item-row">
                                 <td>
                                     <select name="items[{{ $index }}][repair_type]" class="form-select bg-light border-0 repair-type" required>
@@ -82,7 +87,6 @@
                                         @foreach(\App\Models\RepairType::where('status','Active')->orderBy('name')->get() as $type)
                                             <option value="{{ $type->name }}" {{ $item->repair_type === $type->name ? 'selected' : '' }}>{{ $type->name }}</option>
                                         @endforeach
-                                        {{-- keep old value even if type was deleted/inactive --}}
                                         @if($item->repair_type && !\App\Models\RepairType::where('name',$item->repair_type)->exists())
                                             <option value="{{ $item->repair_type }}" selected>{{ $item->repair_type }}</option>
                                         @endif
@@ -90,7 +94,7 @@
                                 </td>
                                 <td><input type="number" step="0.01" name="items[{{ $index }}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="{{ $item->price }}" min="0" required></td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" {{ $loop->count == 1 ? 'disabled' : '' }}><i class="bi bi-x-lg"></i></button>
+                                    <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" {{ $repairItems->count() == 1 ? 'disabled' : '' }}><i class="bi bi-x-lg"></i></button>
                                 </td>
                             </tr>
                             @endforeach
@@ -113,8 +117,53 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td class="text-end fw-bold pt-3 pb-3">Subtotal Estimated Cost:</td>
-                            <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3" id="repairTotal">${{ number_format($repair->repair_price, 2) }}</td>
+                            <td class="text-end fw-bold pt-3 pb-3">Repair Subtotal Cost:</td>
+                            <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3" id="repairTotal">${{ number_format($repairItems->sum('price'), 2) }}</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 pt-4 border-top">
+                <h5 class="mb-0 fw-semibold text-primary">Lenses</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" id="addLensBtn"><i class="bi bi-plus-lg"></i> Add Lens</button>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle" id="lensesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 70%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0">Lens Type / Name</th>
+                            <th style="width: 25%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0 text-end">Cost ($)</th>
+                            <th style="width: 5%" class="border-bottom-0"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lensesBody">
+                        @foreach($lensItems as $index => $item)
+                        <tr class="lens-row">
+                            <td>
+                                <select name="lenses[{{ $index }}][lens_type]" class="form-select bg-light border-0" required>
+                                    <option value="">— Select Lens —</option>
+                                    @foreach($prescriptionTypes as $pt)
+                                        <option value="{{ $pt->name }}" {{ $item->repair_type === $pt->name ? 'selected' : '' }}>{{ $pt->name }}</option>
+                                    @endforeach
+                                    @if($item->repair_type && !$prescriptionTypes->contains('name', $item->repair_type))
+                                        <option value="{{ $item->repair_type }}" selected>{{ $item->repair_type }}</option>
+                                    @endif
+                                </select>
+                            </td>
+                            <td><input type="number" step="0.01" name="lenses[{{ $index }}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="{{ $item->price }}" min="0" required></td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-light text-danger remove-lens rounded-circle"><i class="bi bi-x-lg"></i></button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="text-end fw-bold pt-3 pb-3">Lenses Subtotal Cost:</td>
+                            <td class="text-end fw-bold fs-5 text-dark pt-3 pb-3" id="lensesTotal">${{ number_format($lensItems->sum('price'), 2) }}</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -151,29 +200,39 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let itemIndex = {{ $repair->items ? $repair->items->count() : 1 }};
+    let itemIndex = {{ $repairItems->count() ?: 1 }};
+    let lensIndex = {{ $lensItems->count() ?: 0 }};
     const itemsBody = document.getElementById('itemsBody');
+    const lensesBody = document.getElementById('lensesBody');
 
     function calculateTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.item-row').forEach(row => {
+        let repairSubtotal = 0;
+        document.querySelectorAll('#itemsBody .item-row').forEach(row => {
             const price = parseFloat(row.querySelector('.price').value) || 0;
-            subtotal += price;
+            repairSubtotal += price;
         });
-        document.getElementById('repairTotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('repairTotal').textContent = '$' + repairSubtotal.toFixed(2);
 
+        let lensesSubtotal = 0;
+        document.querySelectorAll('#lensesBody .lens-row').forEach(row => {
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            lensesSubtotal += price;
+        });
+        document.getElementById('lensesTotal').textContent = '$' + lensesSubtotal.toFixed(2);
+        
         const deliveryCharge = parseFloat(document.getElementById('delivery_charge').value) || 0;
-        const grandTotal = subtotal + deliveryCharge;
+        const grandTotal = repairSubtotal + lensesSubtotal + deliveryCharge;
         document.getElementById('grandTotal').textContent = '$' + grandTotal.toFixed(2);
 
-        const rows = document.querySelectorAll('.item-row');
-        rows.forEach(row => {
-            row.querySelector('.remove-item').disabled = rows.length === 1;
+        const repairRows = document.querySelectorAll('#itemsBody .item-row');
+        repairRows.forEach(row => {
+            row.querySelector('.remove-item').disabled = repairRows.length === 1;
         });
     }
 
     const repairTypesData = {!! json_encode(\App\Models\RepairType::where('status','Active')->orderBy('name')->get()->keyBy('name')) !!};
     const repairTypeOptions = Object.keys(repairTypesData);
+    const prescriptionTypes = {!! json_encode($prescriptionTypes) !!};
 
     document.getElementById('addItemBtn').addEventListener('click', function() {
         let opts = '<option value="">— Select Repair Type —</option>';
@@ -194,7 +253,26 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateTotals();
     });
 
-    itemsBody.addEventListener('input', function(e) {
+    document.getElementById('addLensBtn').addEventListener('click', function() {
+        let opts = '<option value="">— Select Lens —</option>';
+        prescriptionTypes.forEach(pt => { opts += `<option value="${pt.name}">${pt.name}</option>`; });
+        const tr = document.createElement('tr');
+        tr.className = 'lens-row';
+        tr.innerHTML = `
+            <td>
+                <select name="lenses[${lensIndex}][lens_type]" class="form-select bg-light border-0" required>${opts}</select>
+            </td>
+            <td><input type="number" step="0.01" name="lenses[${lensIndex}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0" required></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-light text-danger remove-lens rounded-circle"><i class="bi bi-x-lg"></i></button>
+            </td>
+        `;
+        lensesBody.appendChild(tr);
+        lensIndex++;
+        calculateTotals();
+    });
+
+    document.addEventListener('input', function(e) {
         if(e.target.classList.contains('price')) {
             calculateTotals();
         }
@@ -215,13 +293,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('delivery_charge').addEventListener('input', calculateTotals);
 
-    itemsBody.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
         if(e.target.closest('.remove-item')) {
             const btn = e.target.closest('.remove-item');
             if(!btn.disabled) {
                 btn.closest('tr').remove();
                 calculateTotals();
             }
+        }
+        if(e.target.closest('.remove-lens')) {
+            e.target.closest('tr').remove();
+            calculateTotals();
         }
     });
 
