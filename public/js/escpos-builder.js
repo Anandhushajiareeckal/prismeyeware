@@ -146,9 +146,6 @@ function buildReceipt(data) {
     r += 'PH: 09 948 8080 / 02108321242' + LF;
     r += 'GST# 138-002-128' + LF;
 
-    // ── Divider ─────────────────────────────────────────────
-    r += dashLine('-');
-
     // ── Invoice / Transaction line ───────────────────────────
     r += ESCPOS.ALIGN_LEFT;
     r += ESCPOS.SIZE_NORMAL;
@@ -181,20 +178,10 @@ function buildReceipt(data) {
 
     // ── Job description (Repair) ─────────────────────────────
     if (data.jobDescription) {
-        r += dashLine('.');
         r += ESCPOS.BOLD_ON;
         r += data.jobDescription + LF;
         r += ESCPOS.BOLD_OFF;
     }
-
-    // ── Divider ─────────────────────────────────────────────
-    r += dashLine('-');
-
-    // ── Items header ─────────────────────────────────────────
-    r += ESCPOS.BOLD_ON;
-    r += twoColLine('ITEM', 'AMOUNT');
-    r += ESCPOS.BOLD_OFF;
-    r += dashLine('.');
 
     // ── Line items ───────────────────────────────────────────
     r += ESCPOS.ALIGN_LEFT;
@@ -205,11 +192,12 @@ function buildReceipt(data) {
         r += twoColLine(name, price);
     });
 
-    // ── Divider ─────────────────────────────────────────────
-    r += dashLine('-');
-
     // ── Totals ───────────────────────────────────────────────
     r += ESCPOS.SIZE_NORMAL;
+    
+    r += ESCPOS.BOLD_ON;
+    r += twoColLine('TOTAL', '$' + Number(data.totalAmount).toFixed(2));
+    r += ESCPOS.BOLD_OFF;
 
     // Sub-totals (tax, discount) if present
     if (data.taxAmount > 0) {
@@ -222,14 +210,15 @@ function buildReceipt(data) {
         r += twoColLine('Delivery', '+$' + Number(data.deliveryCharge).toFixed(2));
     }
 
-    // Grand Total — bold + double-height
-    r += dashLine('=');
+    // ── Divider ─────────────────────────────────────────────
+    r += dashLine('-');
+
+    // Grand Total (Account)
     r += ESCPOS.BOLD_ON;
     r += ESCPOS.SIZE_DOUBLE_H;
-    r += twoColLine('TOTAL', '$' + Number(data.totalAmount).toFixed(2), Math.floor(COLS / 1));
+    r += twoColLine('ACCOUNT', '$' + Number(data.totalAmount).toFixed(2), Math.floor(COLS / 1));
     r += ESCPOS.SIZE_NORMAL;
     r += ESCPOS.BOLD_OFF;
-    r += dashLine('=');
 
     r += ESCPOS.ALIGN_LEFT;
 
@@ -240,12 +229,10 @@ function buildReceipt(data) {
 
     // ── Notes ────────────────────────────────────────────────
     if (data.notes) {
-        r += dashLine('.');
         r += 'Note: ' + data.notes + LF;
     }
 
     // ── Footer ───────────────────────────────────────────────
-    r += dashLine('-');
     r += ESCPOS.ALIGN_CENTER;
     r += ESCPOS.BOLD_ON;
     r += 'Thank You!' + LF;
