@@ -166,17 +166,21 @@
                                 <span class="text-muted">Total Tax:</span>
                                 <span class="fw-medium text-dark" id="invoiceTax">+$0.00</span>
                             </div>
-                            @if($repair || request('repair_id'))
-                            <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Delivery Charge:</span>
                                 <input type="number" step="0.01" name="delivery_charge" id="delivery_charge" class="form-control form-control-sm bg-white border-1 text-end fw-medium" style="width: 100px;" value="{{ old('delivery_charge', $repair ? number_format($repair->delivery_charge ?? 0, 2, '.', '') : '0.00') }}">
                             </div>
-                            @else
-                            <input type="hidden" name="delivery_charge" id="delivery_charge" value="0.00">
-                            @endif
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Total Amount:</span>
+                                <span class="fw-bold fs-5 text-success" id="invoiceTotal">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Amount Paid:</span>
+                                <input type="number" step="0.01" name="paid_amount" id="paid_amount" class="form-control form-control-sm bg-white border-1 text-end fw-medium" style="width: 100px;" value="{{ old('paid_amount', '0.00') }}">
+                            </div>
                             <div class="d-flex justify-content-between border-top border-secondary pt-3">
-                                <span class="fw-bold fs-5 text-dark">Total Due:</span>
-                                <span class="fw-bold fs-4 text-success" id="invoiceTotal">$0.00</span>
+                                <span class="fw-bold fs-5 text-dark">Balance Due:</span>
+                                <span class="fw-bold fs-4 text-primary" id="balanceDue">$0.00</span>
                             </div>
                         </div>
                     </div>
@@ -226,12 +230,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Total = subtotal - discount + delivery charge (tax is inclusive, no addition)
         const deliveryCharge = parseFloat(document.getElementById('delivery_charge').value) || 0;
+        const paidAmount = parseFloat(document.getElementById('paid_amount').value) || 0;
         const finalTotal = (subtotal - totalDiscount) + deliveryCharge;
+        const balanceDue = finalTotal - paidAmount;
         
         document.getElementById('invoiceSubtotal').textContent = '$' + subtotal.toFixed(2);
         document.getElementById('invoiceDiscount').textContent = '-$' + totalDiscount.toFixed(2);
         document.getElementById('invoiceTax').textContent = '$' + totalTax.toFixed(2) + ' (incl.)';
         document.getElementById('invoiceTotal').textContent = '$' + finalTotal.toFixed(2);
+        document.getElementById('balanceDue').textContent = '$' + balanceDue.toFixed(2);
         
         const rows = document.querySelectorAll('.item-row');
         rows.forEach(row => {
@@ -268,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('delivery_charge').addEventListener('input', calculateTotals);
+    document.getElementById('paid_amount').addEventListener('input', calculateTotals);
 
     itemsBody.addEventListener('click', function(e) {
         if(e.target.closest('.remove-item')) {

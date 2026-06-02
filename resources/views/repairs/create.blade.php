@@ -78,22 +78,22 @@
                 <table class="table table-bordered align-middle" id="itemsTable">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 70%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0">Repair Type / Name <span class="text-danger">*</span></th>
-                            <th style="width: 25%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0 text-end">Estimated Cost ($)<span class="text-danger">*</span></th>
+                            <th style="width: 70%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0">Repair Type / Name</th>
+                            <th style="width: 25%" class="text-muted fw-bold small text-uppercase tracking-wide border-bottom-0 text-end">Estimated Cost ($)</th>
                             <th style="width: 5%" class="border-bottom-0"></th>
                         </tr>
                     </thead>
                     <tbody id="itemsBody">
                         <tr class="item-row">
                             <td>
-                                <select name="items[0][repair_type]" class="form-select bg-light border-0 repair-type" required>
+                                <select name="items[0][repair_type]" class="form-select bg-light border-0 repair-type">
                                     <option value="">— Select Repair Type —</option>
                                     @foreach(\App\Models\RepairType::where('status','Active')->orderBy('name')->get() as $type)
                                         <option value="{{ $type->name }}">{{ $type->name }}</option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td><input type="number" step="0.01" name="items[0][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0" required></td>
+                            <td><input type="number" step="0.01" name="items[0][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0"></td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-light text-danger remove-item rounded-circle" disabled><i class="bi bi-x-lg"></i></button>
                             </td>
@@ -124,7 +124,20 @@
                         </tr>
                     </thead>
                     <tbody id="lensesBody">
-                        {{-- Lens rows will be added via JS --}}
+                        <tr class="lens-row">
+                            <td>
+                                <select name="lenses[0][lens_type]" class="form-select bg-light border-0">
+                                    <option value="">— Select Lens —</option>
+                                    @foreach($prescriptionTypes as $pt)
+                                        <option value="{{ $pt->name }}">{{ $pt->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td><input type="number" step="0.01" name="lenses[0][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0"></td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-light text-danger remove-lens rounded-circle" disabled><i class="bi bi-x-lg"></i></button>
+                            </td>
+                        </tr>
                     </tbody>
                     <tfoot>
                         <tr>
@@ -162,7 +175,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let itemIndex = 1;
-    let lensIndex = 0;
+    let lensIndex = 1;
     const itemsBody = document.getElementById('itemsBody');
     const lensesBody = document.getElementById('lensesBody');
 
@@ -188,6 +201,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const repairRows = document.querySelectorAll('#itemsBody .item-row');
         repairRows.forEach(row => {
             row.querySelector('.remove-item').disabled = repairRows.length === 1;
+        });
+
+        const lensRows = document.querySelectorAll('#lensesBody .lens-row');
+        lensRows.forEach(row => {
+            row.querySelector('.remove-lens').disabled = lensRows.length === 1;
         });
     }
 
@@ -221,9 +239,9 @@ document.addEventListener('DOMContentLoaded', function() {
         tr.className = 'lens-row';
         tr.innerHTML = `
             <td>
-                <select name="lenses[${lensIndex}][lens_type]" class="form-select bg-light border-0" required>${opts}</select>
+                <select name="lenses[${lensIndex}][lens_type]" class="form-select bg-light border-0">${opts}</select>
             </td>
-            <td><input type="number" step="0.01" name="lenses[${lensIndex}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0" required></td>
+            <td><input type="number" step="0.01" name="lenses[${lensIndex}][price]" class="form-control bg-light border-0 text-end price fw-medium text-success" value="0.00" min="0"></td>
             <td class="text-center">
                 <button type="button" class="btn btn-sm btn-light text-danger remove-lens rounded-circle"><i class="bi bi-x-lg"></i></button>
             </td>

@@ -14,6 +14,39 @@
     </div>
 </div>
 
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form action="{{ route('repairs.index') }}" method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="search" class="form-label small fw-medium text-muted">Search (Ref / Name / No.)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" id="search" class="form-control border-start-0" placeholder="Search..." value="{{ request('search') }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="date" class="form-label small fw-medium text-muted">Date</label>
+                <input type="date" name="date" id="date" class="form-control" value="{{ request('date') }}">
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label small fw-medium text-muted">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    @foreach(['Pending', 'In Progress', 'Completed', 'Collected', 'Cancelled'] as $status)
+                        <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="d-flex gap-2 w-100">
+                    <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                    <a href="{{ route('repairs.index') }}" class="btn btn-light" title="Reset"><i class="bi bi-arrow-clockwise"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card shadow-sm border-0">
     <div class="card-body p-0">
         <div class="table-responsive">

@@ -9,7 +9,7 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_number', 'customer_id', 'order_id', 'repair_id',
         'invoice_date', 'subtotal', 'tax_amount', 'discount_amount', 'delivery_charge',
-        'total_amount', 'payment_mode', 'payment_status', 'notes', 'staff_name'
+        'total_amount', 'paid_amount', 'balance_amount', 'payment_mode', 'payment_status', 'notes', 'staff_name'
     ];
 
     public function customer() { return $this->belongsTo(Customer::class); }

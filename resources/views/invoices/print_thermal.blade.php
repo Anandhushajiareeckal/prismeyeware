@@ -138,6 +138,8 @@
     $invoiceDate = \Carbon\Carbon::parse($invoice->created_at ?? $invoice->invoice_date)->format('d-M-Y H:i');
     $jobDesc     = optional($invoice->repair)->job_description;
     $invoiceNotes = $invoice->notes ?: optional($invoice->repair)->repair_notes;
+    $paidAmount    = floatval($invoice->paid_amount ?? 0);
+    $balanceDue    = floatval($invoice->balance_amount ?? 0);
 
     // Pre-built for @json() — avoids Blade parse errors with closures/arrays inside @json()
     $jsCustomer = $customer ? [
@@ -234,25 +236,10 @@
             <td class="lbl">TOTAL</td>
             <td class="amt">${{ number_format($totalAmount, 2) }}</td>
         </tr>
-    </table>
-
-    <table class="totals-table">
-        @if($taxAmount > 0)
+        @if($paidAmount > 0)
         <tr>
-            <td class="lbl">GST Incl.</td>
-            <td class="amt">${{ number_format($taxAmount, 2) }}</td>
-        </tr>
-        @endif
-        @if($discountAmount > 0)
-        <tr>
-            <td class="lbl">Discount</td>
-            <td class="amt">-${{ number_format($discountAmount, 2) }}</td>
-        </tr>
-        @endif
-        @if($deliveryCharge > 0)
-        <tr>
-            <td class="lbl">Delivery</td>
-            <td class="amt">+${{ number_format($deliveryCharge, 2) }}</td>
+            <td class="lbl">AMOUNT PAID</td>
+            <td class="amt">${{ number_format($paidAmount, 2) }}</td>
         </tr>
         @endif
     </table>
@@ -261,8 +248,8 @@
 
     <table class="totals-table">
         <tr class="row-account">
-            <td class="lbl">ACCOUNT</td>
-            <td class="amt">${{ number_format($totalAmount, 2) }}</td>
+            <td class="lbl">BALANCE DUE</td>
+            <td class="amt">${{ number_format($balanceDue, 2) }}</td>
         </tr>
     </table>
 

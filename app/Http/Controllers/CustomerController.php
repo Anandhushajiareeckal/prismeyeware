@@ -35,13 +35,17 @@ class CustomerController extends Controller
     public function store(StoreCustomerRequest $request)
     {
         $data = $request->validated();
-        $latestCustomer = \App\Models\Customer::orderBy('id', 'desc')->first();
+        // Find all numeric customer numbers
+        $numbers = \App\Models\Customer::pluck('customer_number')
+            ->filter(fn($n) => is_numeric($n))
+            ->map(fn($n) => intval($n));
         
-        $nextCustomerId = 100;
-        if ($latestCustomer && is_numeric($latestCustomer->customer_number)) {
-            $nextCustomerId = max(100, intval($latestCustomer->customer_number) + 1);
-        } else {
-            $nextCustomerId = max(100, (\App\Models\Customer::max('id') ?? 0) + 1);
+        $nextCustomerId = $numbers->count() > 0 ? $numbers->max() + 1 : 100;
+        $nextCustomerId = max(100, $nextCustomerId);
+        
+        // Final safety check: ensure the generated number doesn't exist (even if it's alphanumeric)
+        while (\App\Models\Customer::where('customer_number', sprintf('%05d', $nextCustomerId))->exists()) {
+            $nextCustomerId++;
         }
         
         $data['customer_number'] = sprintf('%05d', $nextCustomerId);

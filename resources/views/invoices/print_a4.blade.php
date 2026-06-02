@@ -303,8 +303,9 @@
                     <div class="inv-number"></div>
                     <div class="balance-label">Balance Due</div>
                     @php
-                        $balanceDue = $invoice->payment_status === 'Paid' ? 0 : floatval($invoice->total_amount);
+                        $balanceDue = $invoice->balance_amount;
                         $isPaid = $invoice->payment_status === 'Paid';
+                        $paidAmount = $invoice->paid_amount;
                     @endphp
                     <div class="balance-amount {{ $isPaid ? 'paid' : '' }}">
                         NZD{{ number_format($balanceDue, 2) }}
@@ -433,10 +434,10 @@
                             <td>Total</td>
                             <td>NZD{{ number_format($invoice->total_amount, 2) }}</td>
                         </tr>
-                        @if($isPaid)
+                        @if($paidAmount > 0)
                         <tr class="row-discount">
                             <td>Payment Made</td>
-                            <td>(-) {{ number_format($invoice->total_amount, 2) }}</td>
+                            <td>(-) {{ number_format($paidAmount, 2) }}</td>
                         </tr>
                         @endif
                         <tr class="row-balance">

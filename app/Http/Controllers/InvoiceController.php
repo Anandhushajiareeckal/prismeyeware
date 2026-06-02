@@ -78,6 +78,17 @@ class InvoiceController extends Controller
         
         $totalAmount = ($subtotal - $totalDiscount) + ($data['delivery_charge'] ?? 0);
 
+        $paidAmount = $data['paid_amount'] ?? 0;
+        $balanceAmount = $totalAmount - $paidAmount;
+        
+        $paymentStatus = $data['payment_status'];
+        if ($balanceAmount <= 0) {
+            $paymentStatus = 'Paid';
+            $balanceAmount = 0;
+        } elseif ($paidAmount > 0) {
+            $paymentStatus = 'Partial';
+        }
+
         $invoice = Invoice::create([
             'invoice_number' => str_pad((Invoice::max('id') ?? 0) + 1, 6, '0', STR_PAD_LEFT),
             'customer_id' => $data['customer_id'],
@@ -89,8 +100,10 @@ class InvoiceController extends Controller
             'discount_amount' => $totalDiscount,
             'delivery_charge' => $data['delivery_charge'] ?? 0,
             'total_amount' => $totalAmount,
+            'paid_amount' => $paidAmount,
+            'balance_amount' => $balanceAmount,
             'payment_mode' => $data['payment_mode'] ?? null,
-            'payment_status' => $data['payment_status'],
+            'payment_status' => $paymentStatus,
             'notes' => $data['notes'] ?? null,
             'staff_name' => $data['staff_name'] ?? null,
         ]);
@@ -140,6 +153,17 @@ class InvoiceController extends Controller
         
         $totalAmount = ($subtotal - $totalDiscount) + ($data['delivery_charge'] ?? 0);
 
+        $paidAmount = $data['paid_amount'] ?? 0;
+        $balanceAmount = $totalAmount - $paidAmount;
+
+        $paymentStatus = $data['payment_status'];
+        if ($balanceAmount <= 0) {
+            $paymentStatus = 'Paid';
+            $balanceAmount = 0;
+        } elseif ($paidAmount > 0) {
+            $paymentStatus = 'Partial';
+        }
+
         $invoice->update([
             'invoice_date' => $data['invoice_date'],
             'subtotal' => $subtotal,
@@ -147,8 +171,10 @@ class InvoiceController extends Controller
             'discount_amount' => $totalDiscount,
             'delivery_charge' => $data['delivery_charge'] ?? 0,
             'total_amount' => $totalAmount,
+            'paid_amount' => $paidAmount,
+            'balance_amount' => $balanceAmount,
             'payment_mode' => $data['payment_mode'] ?? null,
-            'payment_status' => $data['payment_status'],
+            'payment_status' => $paymentStatus,
             'notes' => $data['notes'] ?? null,
             'staff_name' => $data['staff_name'] ?? null,
         ]);

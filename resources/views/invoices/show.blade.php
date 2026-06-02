@@ -130,9 +130,17 @@
                             <span class="fw-medium text-dark">+${{ number_format($invoice->delivery_charge ?? 0, 2) }}</span>
                         </div>
                         @endif
-                        <div class="d-flex justify-content-between border-top border-secondary pt-3">
-                            <span class="fw-bold fs-5 text-dark">Total Due</span>
-                            <span class="fw-bold fs-4 text-primary">${{ number_format($invoice->total_amount, 2) }}</span>
+                        <div class="d-flex justify-content-between mb-3 border-top border-secondary pt-3">
+                            <span class="fw-bold fs-5 text-dark">Total Amount</span>
+                            <span class="fw-bold fs-4 text-success">${{ number_format($invoice->total_amount, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Amount Paid</span>
+                            <span class="fw-medium text-dark">${{ number_format($invoice->paid_amount ?? 0, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-top pt-2">
+                            <span class="fw-bold text-dark">Balance Due</span>
+                            <span class="fw-bold text-primary">${{ number_format($invoice->balance_amount ?? 0, 2) }}</span>
                         </div>
                     </div>
                 </div>

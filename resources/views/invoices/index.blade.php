@@ -51,7 +51,7 @@
                         <th class="border-bottom-0">Invoice No.</th>
                         <th class="border-bottom-0">Date</th>
                         <th class="border-bottom-0">Customer</th>
-                        <th class="border-bottom-0">Total</th>
+                        <th class="border-bottom-0">Total / Balance</th>
                         <th class="border-bottom-0">Status</th>
                         <th class="text-end border-bottom-0">Actions</th>
                     </tr>
@@ -70,7 +70,12 @@
                                 <span class="text-muted">Walk-in / Unknown</span>
                             @endif
                         </td>
-                        <td class="fw-bold">${{ number_format($invoice->total_amount, 2) }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">${{ number_format($invoice->total_amount, 2) }}</div>
+                            @if($invoice->balance_amount > 0)
+                                <div class="small text-danger">Bal: ${{ number_format($invoice->balance_amount, 2) }}</div>
+                            @endif
+                        </td>
                         <td>
                             @if($invoice->payment_status === 'Paid')
                                 <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">Paid</span>

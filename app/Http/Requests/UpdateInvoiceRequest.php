@@ -21,6 +21,7 @@ class UpdateInvoiceRequest extends FormRequest
             'invoice_date' => 'required|date',
             'payment_mode' => 'nullable|string',
             'payment_status' => 'required|string',
+            'paid_amount' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
             'staff_name' => 'nullable|string',
             'delivery_charge' => 'nullable|numeric|min:0',

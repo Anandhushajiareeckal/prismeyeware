@@ -14,16 +14,32 @@ class RepairController extends Controller
     public function index(Request $request)
     {
         $query = Repair::with('customer');
-        if ($request->has('search') && $request->search) {
+
+        // Search Filter (Repair No., Reference, Customer Name/Phone)
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('repair_number', 'like', "%{$search}%")
-                  ->orWhereHas('customer', function($q) use ($search) {
-                      $q->where('first_name', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('repair_number', 'like', "%{$search}%")
+                  ->orWhere('reference', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function($cq) use ($search) {
+                      $cq->where('first_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhere('phone_number', 'like', "%{$search}%");
                   });
+            });
         }
-        $repairs = $query->latest('repair_date')->paginate(15);
+
+        // Date Filter
+        if ($request->filled('date')) {
+            $query->whereDate('repair_date', $request->date);
+        }
+
+        // Status Filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $repairs = $query->latest('repair_date')->paginate(15)->withQueryString();
         return view('repairs.index', compact('repairs'));
     }
 
@@ -50,14 +66,20 @@ class RepairController extends Controller
         $data['repair_number'] = sprintf('%05d', $nextRepairId);
         $data['created_by'] = auth()->id();
         
+        // Filter out empty rows
+        $data['items'] = array_filter($data['items'] ?? [], function($item) {
+            return !empty($item['repair_type']);
+        });
+        $data['lenses'] = array_filter($data['lenses'] ?? [], function($lens) {
+            return !empty($lens['lens_type']);
+        });
+
         $repair_price = 0;
         foreach($data['items'] as $item) {
             $repair_price += ($item['price'] ?? 0);
         }
-        if (!empty($data['lenses'])) {
-            foreach($data['lenses'] as $lens) {
-                $repair_price += ($lens['price'] ?? 0);
-            }
+        foreach($data['lenses'] as $lens) {
+            $repair_price += ($lens['price'] ?? 0);
         }
         $data['repair_price'] = $repair_price;
 
@@ -108,14 +130,20 @@ class RepairController extends Controller
     {
         $data = $request->validated();
         
+        // Filter out empty rows
+        $data['items'] = array_filter($data['items'] ?? [], function($item) {
+            return !empty($item['repair_type']);
+        });
+        $data['lenses'] = array_filter($data['lenses'] ?? [], function($lens) {
+            return !empty($lens['lens_type']);
+        });
+
         $repair_price = 0;
         foreach($data['items'] as $item) {
             $repair_price += ($item['price'] ?? 0);
         }
-        if (!empty($data['lenses'])) {
-            foreach($data['lenses'] as $lens) {
-                $repair_price += ($lens['price'] ?? 0);
-            }
+        foreach($data['lenses'] as $lens) {
+            $repair_price += ($lens['price'] ?? 0);
         }
         $data['repair_price'] = $repair_price;
 
