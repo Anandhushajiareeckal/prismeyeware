@@ -36,7 +36,7 @@ class CustomerController extends Controller
     {
         $data = $request->validated();
         // Find all numeric customer numbers
-        $numbers = \App\Models\Customer::pluck('customer_number')
+        $numbers = \App\Models\Customer::withTrashed()->pluck('customer_number')
             ->filter(fn($n) => is_numeric($n))
             ->map(fn($n) => intval($n));
         
@@ -44,7 +44,7 @@ class CustomerController extends Controller
         $nextCustomerId = max(100, $nextCustomerId);
         
         // Final safety check: ensure the generated number doesn't exist (even if it's alphanumeric)
-        while (\App\Models\Customer::where('customer_number', sprintf('%05d', $nextCustomerId))->exists()) {
+        while (\App\Models\Customer::withTrashed()->where('customer_number', sprintf('%05d', $nextCustomerId))->exists()) {
             $nextCustomerId++;
         }
         
