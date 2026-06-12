@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
 
     // Report Downloads (CSV)
     Route::get('/reports/download/invoice/{invoice}', [App\Http\Controllers\ReportDownloadController::class, 'downloadSingle'])->name('reports.download.single');
+    Route::get('/reports/download/quote/{quote}', [App\Http\Controllers\ReportDownloadController::class, 'downloadQuote'])->name('reports.download.quote');
     Route::get('/reports/download/bulk', [App\Http\Controllers\ReportDownloadController::class, 'downloadBulk'])->name('reports.download.bulk');
     Route::get('/reports/download/customer/{customer}/all', [App\Http\Controllers\ReportDownloadController::class, 'downloadCustomerAll'])->name('reports.download.customer.all');
 

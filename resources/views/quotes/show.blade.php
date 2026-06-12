@@ -8,6 +8,7 @@
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('quotes.print.a4', $quote) }}" target="_blank" class="btn btn-outline-primary"><i class="bi bi-printer"></i> Print A4</a>
+        <a href="{{ route('reports.download.quote', $quote) }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
         <a href="{{ route('quotes.edit', $quote) }}" class="btn btn-primary"><i class="bi bi-pencil"></i> Edit</a>
         <form action="{{ route('quotes.destroy', $quote) }}" method="POST" onsubmit="return confirm('Delete this quote?');">
             @csrf

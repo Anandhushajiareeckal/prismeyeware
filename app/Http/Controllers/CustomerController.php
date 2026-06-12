@@ -12,18 +12,34 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Customer::where('category', '!=', 'Shop'); // or 'Customer' or default null
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
+        $query = Customer::where('category', '!=', 'Shop');
+
+        if ($request->filled('customer_number')) {
+            $query->where('customer_number', 'like', "%" . $request->customer_number . "%");
+        }
+
+        if ($request->filled('name')) {
+            $search = $request->name;
             $query->where(function($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('customer_number', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
             });
         }
-        $customers = $query->latest()->paginate(15);
+
+        if ($request->filled('phone')) {
+            $query->where('phone_number', 'like', "%" . $request->phone . "%");
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $customers = $query->latest()->paginate(15)->withQueryString();
         return view('customers.index', compact('customers'));
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\Customer;
+use App\Models\Quote;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportDownloadController extends Controller
@@ -20,6 +21,21 @@ class ReportDownloadController extends Controller
             ->setPaper('a4', 'portrait');
 
         $filename = 'invoice-' . $invoice->invoice_number . '.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Download a single quote as PDF.
+     */
+    public function downloadQuote(Quote $quote)
+    {
+        $quote->load(['customer', 'items', 'repair', 'order']);
+
+        $pdf = Pdf::loadView('quotes.pdf_quote', compact('quote'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'quote-' . $quote->quote_number . '.pdf';
 
         return $pdf->download($filename);
     }

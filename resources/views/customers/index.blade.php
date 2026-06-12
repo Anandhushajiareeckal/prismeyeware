@@ -6,7 +6,38 @@
     <a href="{{ route('customers.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Customer</a>
 </div>
 
-<div class="card">
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body">
+        <form action="{{ route('customers.index') }}" method="GET" class="row g-3 align-items-center">
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Customer No.</label>
+                <input type="text" name="customer_number" class="form-control form-control-sm" placeholder="CUST-..." value="{{ request('customer_number') }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Date From</label>
+                <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Date To</label>
+                <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-1">Customer Name</label>
+                <input type="text" name="name" class="form-control form-control-sm" placeholder="Search name..." value="{{ request('name') }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Phone</label>
+                <input type="text" name="phone" class="form-control form-control-sm" placeholder="Search phone..." value="{{ request('phone') }}">
+            </div>
+            <div class="col-md-1 d-flex gap-2 mt-auto">
+                <button type="submit" class="btn btn-sm btn-primary w-100" title="Filter"><i class="bi bi-funnel"></i></button>
+                <a href="{{ route('customers.index') }}" class="btn btn-sm btn-light w-100" title="Clear"><i class="bi bi-x-circle"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">

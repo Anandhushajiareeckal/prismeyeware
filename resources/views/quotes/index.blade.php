@@ -85,6 +85,7 @@
                         </td>
                         <td class="text-end">
                             <a href="{{ route('quotes.print.a4', $quote) }}" target="_blank" class="btn btn-sm btn-light" title="Print A4"><i class="bi bi-printer"></i></a>
+                            <a href="{{ route('reports.download.quote', $quote) }}" class="btn btn-sm btn-light text-success" title="Download PDF"><i class="bi bi-file-earmark-pdf"></i></a>
                             <a href="{{ route('quotes.show', $quote) }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a>
                             <a href="{{ route('quotes.edit', $quote) }}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
                         </td>
