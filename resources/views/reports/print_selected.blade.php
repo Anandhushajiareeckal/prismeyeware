@@ -366,7 +366,7 @@
                             <td class="item-num">{{ $itemIndex++ }}</td>
                             <td>
                                 <span style="font-weight:600; color:#1a2b4a;">{{ $item->item_name }}</span>
-                                <br><small style="color:#999;">@if($item->sku)SKU: {{ $item->sku }}@endif @if($invoice->repair_id) | Ref: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} @elseif($invoice->order_id) | Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} @endif</small>
+                                <br><small style="color:#999;">@if($item->sku)SKU: {{ $item->sku }} @endif @if($invoice->invoice_number) | Inv: {{ $invoice->invoice_number }} @endif @if($invoice->reference_number) | Ref: {{ $invoice->reference_number }} @endif @if($invoice->repair_id) | Job No: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} @elseif($invoice->order_id) | Order No: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} @endif</small>
                             </td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</td>
                             <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
