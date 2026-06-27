@@ -111,7 +111,11 @@ async function connectQZ() {
  */
 async function resolvePrinter() {
     if (QZ_CONFIG.printerName) {
-        return qz.printers.find(QZ_CONFIG.printerName);
+        try {
+            return await qz.printers.find(QZ_CONFIG.printerName);
+        } catch (e) {
+            console.warn(`[QZ] Could not find exact printer "${QZ_CONFIG.printerName}". Falling back to first available...`);
+        }
     }
 
     const printers = await qz.printers.find();

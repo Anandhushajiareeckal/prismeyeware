@@ -116,8 +116,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error('[PrintListener] Printer connection error:', err);
-            // Optionally disable the toggle if printer is completely offline
-            // toggle.checked = false; toggle.dispatchEvent(new Event('change'));
+            
+            // Show error state on badge so user is aware
+            const badge = document.getElementById('print-server-badge');
+            if (badge) {
+                badge.textContent = 'ERR';
+                badge.classList.remove('bg-success');
+                badge.classList.add('bg-danger');
+                badge.title = err.message || 'Printer Error';
+            }
         }
     }
 });
