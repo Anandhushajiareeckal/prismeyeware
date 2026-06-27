@@ -71,13 +71,18 @@ function setupQZSecurity() {
 async function connectQZ() {
     setupQZSecurity();                    // must be called before connect
     if (qz.websocket.isActive()) return;   // already connected
-
     try {
-        // Use the host IP that served the page (the PC) instead of 'localhost'
-        const host = window.location.hostname;
-        // Default ports for QZ Tray are 8182/8183 (insecure/secure) or 8212/8213 for new versions
-        await qz.websocket.connect({ host: host });
-        console.log('[QZ] Connected to ' + host);
+        // Decide which host to connect QZ to
+        let targetHost = window.location.hostname;
+        
+        // If you are on the main PC accessing via the domain name, we MUST use 'localhost'
+        // so that the browser's SSL restrictions and QZ Tray's certificates match up.
+        if (targetHost.includes('prismeyeware.co.nz')) {
+            targetHost = 'localhost';
+        }
+
+        await qz.websocket.connect({ host: targetHost });
+        console.log('[QZ] Connected to ' + targetHost);
         _retries = 0;
     } catch (err) {
         _retries++;
