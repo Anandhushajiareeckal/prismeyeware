@@ -73,8 +73,11 @@ async function connectQZ() {
     if (qz.websocket.isActive()) return;   // already connected
 
     try {
-        await qz.websocket.connect();
-        console.log('[QZ] Connected.');
+        // Use the host IP that served the page (the PC) instead of 'localhost'
+        const host = window.location.hostname;
+        // Default ports for QZ Tray are 8182/8183 (insecure/secure) or 8212/8213 for new versions
+        await qz.websocket.connect({ host: host });
+        console.log('[QZ] Connected to ' + host);
         _retries = 0;
     } catch (err) {
         _retries++;
