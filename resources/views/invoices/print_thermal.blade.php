@@ -276,7 +276,7 @@
 {{-- QZ Tray + ESC/POS scripts --}}
 <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
 <script src="{{ asset('js/escpos-builder.js') }}"></script>
-<script src="{{ asset('js/qz-print.js') }}"></script>
+<script src="{{ asset('js/qz-print.js') }}?v={{ time() }}"></script>
 
 <script>
     /* ── Invoice data from PHP ── */
