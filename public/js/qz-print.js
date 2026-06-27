@@ -77,7 +77,8 @@ async function connectQZ() {
         
         // If you are on the main PC accessing via the domain name, we MUST use 'localhost'
         // so that the browser's SSL restrictions and QZ Tray's certificates match up.
-        if (targetHost.includes('prismeyeware.co.nz')) {
+        // Checking for both spellings (eyeware/eyewear) just in case!
+        if (targetHost.includes('prismeyeware') || targetHost.includes('prismeyewear')) {
             targetHost = 'localhost';
         }
 
