@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Consolidated Invoice</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -32,6 +33,7 @@
         }
         .btn-print-bar button.btn-primary { background: #1a6cdb; color: #fff; }
         .btn-print-bar button.btn-secondary { background: #4a5b7d; color: #fff; }
+        .btn-print-bar button.btn-close { background: #fff; color: #333; border: 1px solid #ccc; }
         .btn-print-bar a { background: #fff; color: #333; border: 1px solid #ccc; }
 
         .page {
@@ -260,8 +262,9 @@
 </head>
 <body>
     <div class="btn-print-bar">
-        <button class="btn-primary" onclick="window.print()">🖨 Print / Save as PDF</button>
-        <button class="btn-secondary" onclick="window.close()">Close Tab</button>
+        <button class="btn-primary" id="btn-thermal" onclick="triggerThermalPrint()">🖨 Thermal Print</button>
+        <button class="btn-secondary" onclick="window.print()">📄 Print / PDF (A4)</button>
+        <button class="btn-close" onclick="window.close()">✕ Close</button>
     </div>
 
     @php
@@ -436,5 +439,97 @@ No additional notes.
             </div>
         </div>
     </div>
+
+{{-- QZ Tray scripts --}}
+<script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
+<script src="{{ asset('js/escpos-builder.js') }}"></script>
+<script src="{{ asset('js/qz-print.js') }}"></script>
+
+<script>
+@php
+    // Build per-invoice data for JS
+    $jsInvoices = [];
+    foreach($invoices as $inv) {
+        $displayLabel  = 'Invoice';
+        $displayNumber = $inv->invoice_number;
+        if ($inv->repair && $inv->repair->reference) {
+            $displayLabel  = 'Ref';
+            $displayNumber = $inv->repair->reference;
+        }
+        $customer = $inv->customer;
+        $jsInvoices[] = [
+            'invoiceNumber'  => $inv->invoice_number,
+            'displayLabel'   => $displayLabel,
+            'displayNumber'  => $displayNumber,
+            'invoiceDate'    => \Carbon\Carbon::parse($inv->invoice_date)->format('d-M-Y'),
+            'staffName'      => $inv->staff_name ?? 'Staff',
+            'customer'       => $customer ? [
+                'id'         => $customer->id,
+                'name'       => $customer->full_name,
+                'address'    => $customer->address_line_1 ?? ($customer->address ?? null),
+                'city'       => $customer->city ?? null,
+                'postalCode' => $customer->postal_code ?? null,
+                'phone'      => $customer->phone_number ?? ($customer->phone ?? null),
+            ] : null,
+            'items'          => $inv->items->map(function($item) {
+                $qty       = intval($item->quantity ?? 1);
+                $rate      = floatval($item->rate ?? 0);
+                $disc      = floatval($item->discount ?? 0);
+                return [
+                    'name'      => $item->item_name,
+                    'qty'       => $qty,
+                    'rate'      => $rate,
+                    'discount'  => $disc,
+                    'lineTotal' => ($qty * $rate) - $disc,
+                ];
+            })->values()->all(),
+            'subtotal'       => floatval($inv->subtotal),
+            'taxAmount'      => floatval($inv->tax_amount),
+            'discountAmount' => floatval($inv->discount_amount),
+            'deliveryCharge' => floatval($inv->delivery_charge ?? 0),
+            'totalAmount'    => floatval($inv->total_amount),
+            'paymentMode'    => $inv->payment_mode ?? null,
+            'notes'          => $inv->notes ?? null,
+            'jobDescription' => optional($inv->repair)->job_description ?? null,
+        ];
+    }
+@endphp
+
+const ALL_INVOICES = @json($jsInvoices);
+
+/**
+ * Print each invoice as a separate ESC/POS thermal receipt.
+ * Connects to QZ Tray once, then sends one job per invoice.
+ */
+async function triggerThermalPrint() {
+    const btn = document.getElementById('btn-thermal');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Printing…'; }
+
+    try {
+        // Connect once
+        await connectQZ();
+
+        for (const invoiceData of ALL_INVOICES) {
+            let rawString = buildReceipt(invoiceData);
+
+            const encoder = new TextEncoder();
+            const bytes   = encoder.encode(rawString);
+            const base64  = btoa(String.fromCharCode(...bytes));
+
+            const printer = await resolvePrinter();
+            const config  = qz.configs.create(printer, { raw: true });
+            await qz.print(config, [{ type: 'raw', format: 'base64', data: base64 }]);
+        }
+
+        console.log('[QZ] All', ALL_INVOICES.length, 'receipts sent.');
+    } catch (err) {
+        console.error('[QZ] Thermal print error:', err);
+        alert(err.message || 'Thermal print failed. Is QZ Tray running on the PC?');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🖨 Thermal Print'; }
+    }
+}
+</script>
+
 </body>
 </html>
