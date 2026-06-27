@@ -175,8 +175,8 @@
 
 {{-- Button bar (hidden on print) --}}
 <div class="btn-bar no-print">
-    <button class="btn btn-print" id="btn-qz-print" onclick="triggerPrint()">🖨 PRINT</button>
-    <button class="btn btn-reprint" id="btn-qz-reprint" onclick="triggerPrint()">↺ RE-PRINT</button>
+    <button class="btn btn-print" id="btn-qz-print" onclick="triggerThermalPrint()">🖨 PRINT</button>
+    <button class="btn btn-reprint" id="btn-qz-reprint" onclick="triggerThermalPrint()">↺ RE-PRINT</button>
     <a href="{{ url()->previous() }}" class="btn btn-close">✕ CLOSE</a>
 </div>
 
@@ -324,9 +324,9 @@
         }
     }
 
-    /* ── Auto-print on page load via ESC/POS ── */
+    /* ── Auto-print on page load via Print Queue ── */
     window.addEventListener('load', () => {
-        setTimeout(triggerPrint, 600);
+        setTimeout(triggerThermalPrint, 600);
     });
 </script>
 
