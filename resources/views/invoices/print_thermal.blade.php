@@ -298,14 +298,26 @@
         jobDescription : @json($jobDesc ?? null),
     };
 
-    /* ── Trigger ESC/POS print via QZ Tray ── */
-    async function triggerPrint() {
+    /* ── Trigger Print Queue via AJAX ── */
+    async function triggerThermalPrint() {
         const btn = document.getElementById('btn-qz-print');
         const btn2 = document.getElementById('btn-qz-reprint');
-        if (btn)  { btn.disabled  = true; btn.textContent  = '⏳ Printing…'; }
-        if (btn2) { btn2.disabled = true; btn2.textContent = '⏳ Printing…'; }
+        if (btn)  { btn.disabled  = true; btn.textContent  = '⏳ Queueing…'; }
+        if (btn2) { btn2.disabled = true; btn2.textContent = '⏳ Queueing…'; }
+        
         try {
-            await printReceipt(INVOICE_DATA);
+            await fetch('/print-jobs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ payload: [INVOICE_DATA] }) // Send array of 1 invoice for consistent queue processing
+            });
+            alert('Sent to print queue! The Main PC will print it momentarily.');
+        } catch (err) {
+            console.error('Queue error:', err);
+            alert('Failed to send print job to queue.');
         } finally {
             if (btn)  { btn.disabled  = false; btn.textContent  = '🖨 PRINT'; }
             if (btn2) { btn2.disabled = false; btn2.textContent = '↺ RE-PRINT'; }

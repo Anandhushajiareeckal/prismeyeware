@@ -503,28 +503,21 @@ const ALL_INVOICES = @json($jsInvoices);
  */
 async function triggerThermalPrint() {
     const btn = document.getElementById('btn-thermal');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Printing…'; }
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Queueing…'; }
 
     try {
-        // Connect once
-        await connectQZ();
-
-        for (const invoiceData of ALL_INVOICES) {
-            let rawString = buildReceipt(invoiceData);
-
-            const encoder = new TextEncoder();
-            const bytes   = encoder.encode(rawString);
-            const base64  = btoa(String.fromCharCode(...bytes));
-
-            const printer = await resolvePrinter();
-            const config  = qz.configs.create(printer, { raw: true });
-            await qz.print(config, [{ type: 'raw', format: 'base64', data: base64 }]);
-        }
-
-        console.log('[QZ] All', ALL_INVOICES.length, 'receipts sent.');
+        await fetch('/print-jobs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ payload: ALL_INVOICES })
+        });
+        alert('Sent to print queue! The Main PC will print it momentarily.');
     } catch (err) {
-        console.error('[QZ] Thermal print error:', err);
-        alert(err.message || 'Thermal print failed. Is QZ Tray running on the PC?');
+        console.error('Queue error:', err);
+        alert('Failed to send print jobs to queue.');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = '🖨 Thermal Print'; }
     }

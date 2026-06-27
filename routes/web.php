@@ -82,6 +82,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/download/bulk', [App\Http\Controllers\ReportDownloadController::class, 'downloadBulk'])->name('reports.download.bulk');
     Route::get('/reports/download/customer/{customer}/all', [App\Http\Controllers\ReportDownloadController::class, 'downloadCustomerAll'])->name('reports.download.customer.all');
 
+    // Print Queue endpoints
+    Route::post('/print-jobs', [App\Http\Controllers\PrintJobController::class, 'store'])->name('print-jobs.store');
+    Route::get('/print-jobs/pending', [App\Http\Controllers\PrintJobController::class, 'pending'])->name('print-jobs.pending');
+    Route::post('/print-jobs/{id}/mark-printed', [App\Http\Controllers\PrintJobController::class, 'markPrinted'])->name('print-jobs.mark-printed');
+
     // Misc
     Route::post('customer-notes',     [CustomerNoteController::class, 'store'])->name('customer-notes.store');
     Route::post('customer-documents', [CustomerDocumentController::class, 'store'])->name('customer-documents.store');

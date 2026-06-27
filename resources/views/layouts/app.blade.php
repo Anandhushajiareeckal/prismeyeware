@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') | {{ config('app.name', 'Prism Eyewear') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logo/fav.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -69,6 +70,16 @@
                     <input type="text" name="q" value="{{ request('q') }}" class="form-control border-0 bg-transparent shadow-none" placeholder="Search customers, orders, repairs...">
                 </form>
                 <div class="d-flex align-items-center">
+                    <!-- Print Server Toggle (For Main Shop PC) -->
+                    <div class="d-none d-md-flex align-items-center me-4">
+                        <div class="form-check form-switch mb-0 d-flex align-items-center">
+                            <input class="form-check-input me-2" type="checkbox" role="switch" id="print-server-toggle" style="width: 32px; height: 16px; cursor: pointer; margin-top:0;">
+                            <label class="form-check-label text-muted fw-semibold d-flex align-items-center gap-1" for="print-server-toggle" style="font-size: 13px; cursor: pointer; margin-bottom:0;">
+                                <i class="bi bi-printer"></i> Print Server <span id="print-server-badge" class="badge bg-secondary" style="font-size: 9px; padding:3px 5px;">OFF</span>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <button class="btn btn-light rounded-circle me-3"><i class="bi bi-bell"></i></button>
                     <div class="dropdown">
                         <button class="btn d-flex align-items-center gap-2 border-0 bg-transparent p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,6 +136,14 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- QZ Print Scripts for Background Listener -->
+    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
+    <script src="{{ asset('js/escpos-builder.js') }}"></script>
+    <!-- Use versioned asset specifically for qz-print if needed, or normal -->
+    <script src="{{ asset('js/qz-print.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/print-listener.js') }}?v={{ time() }}"></script>
+
     @stack('scripts')
 </body>
 </html>
