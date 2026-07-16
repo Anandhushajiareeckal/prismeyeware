@@ -63,6 +63,9 @@
             <button type="button" class="btn btn-sm btn-outline-success" id="btn-download-selected" disabled onclick="submitBulkAction('download')">
                 <i class="bi bi-file-earmark-pdf me-1"></i> Download Selected (PDF)
             </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" id="btn-delete-selected" disabled onclick="submitBulkAction('delete')">
+                <i class="bi bi-trash me-1"></i> Delete Selected
+            </button>
         </div>
     </div>
 
@@ -81,6 +84,11 @@
             <input type="hidden" name="{{ $k }}" value="{{ $v }}">
         @endforeach
         <div id="download-checkboxes-hidden"></div>
+    </form>
+
+    <form id="form-delete-bulk" action="{{ route('reports.delete') }}" method="POST">
+        @csrf
+        <div id="delete-checkboxes-hidden"></div>
     </form>
 
     {{-- ── Invoice Table ── --}}
@@ -141,6 +149,13 @@
                                    class="btn btn-sm btn-light text-success" title="Download PDF">
                                     <i class="bi bi-file-earmark-pdf"></i>
                                 </a>
+                                <form action="{{ route('invoices.destroy', $invoice) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this report? This action cannot be undone.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-light text-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -165,11 +180,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const checkboxes    = document.querySelectorAll('.row-checkbox');
     const printBtn      = document.getElementById('btn-print-selected');
     const downloadBtn   = document.getElementById('btn-download-selected');
+    const deleteBtn     = document.getElementById('btn-delete-selected');
 
     function updateButtonState() {
         const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
         printBtn.disabled    = !anyChecked;
         downloadBtn.disabled = !anyChecked;
+        deleteBtn.disabled   = !anyChecked;
     }
 
     selectAll.addEventListener('change', function () {
@@ -195,8 +212,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!checkedIds.length) return;
 
-        const formId     = action === 'print' ? 'form-print-bulk'    : 'form-download-bulk';
-        const containerId = action === 'print' ? 'print-checkboxes-hidden' : 'download-checkboxes-hidden';
+        if (action === 'delete') {
+            if (!confirm('Are you sure you want to delete the selected reports? This action cannot be undone.')) {
+                return;
+            }
+        }
+
+        const formId     = action === 'print' ? 'form-print-bulk'    : (action === 'download' ? 'form-download-bulk' : 'form-delete-bulk');
+        const containerId = action === 'print' ? 'print-checkboxes-hidden' : (action === 'download' ? 'download-checkboxes-hidden' : 'delete-checkboxes-hidden');
         const form       = document.getElementById(formId);
         const container  = document.getElementById(containerId);
 

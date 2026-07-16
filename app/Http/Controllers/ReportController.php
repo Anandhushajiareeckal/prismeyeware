@@ -76,4 +76,17 @@ class ReportController extends Controller
 
         return view('reports.print_selected', compact('invoices'));
     }
+
+    public function deleteSelected(Request $request)
+    {
+        $invoiceIds = $request->input('invoices', []);
+
+        if (empty($invoiceIds)) {
+            return back()->with('error', 'No reports selected for deletion.');
+        }
+
+        Invoice::destroy($invoiceIds);
+
+        return back()->with('success', 'Selected reports deleted successfully.');
+    }
 }

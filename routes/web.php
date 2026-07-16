@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
     // Reports Module
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/print', [App\Http\Controllers\ReportController::class, 'printSelected'])->name('reports.print');
+    Route::post('/reports/delete-selected', [App\Http\Controllers\ReportController::class, 'deleteSelected'])->name('reports.delete');
     Route::get('/reports/customer/{customer}', [App\Http\Controllers\ReportController::class, 'customer'])->name('reports.customer');
 
     // Report Downloads (CSV)
