@@ -188,9 +188,8 @@
                         <div class="item-sku">
                             @if($item->sku)SKU: {{ $item->sku }} @endif 
                             @if($invoice->invoice_number) | Inv: {{ $invoice->invoice_number }} @endif 
-                            @if($invoice->reference_number) | Ref: {{ $invoice->reference_number }} @endif 
-                            @if($invoice->repair_id) | Job No: #{{ $invoice->repair?->repair_number ?? $invoice->repair_id }} 
-                            @elseif($invoice->order_id) | Order No: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} 
+                            @if($invoice->repair_id) | Ref: {{ $invoice->repair?->reference ?: ('#'.($invoice->repair?->repair_number ?? $invoice->repair_id)) }} 
+                            @elseif($invoice->order_id) | Ref: {{ $invoice->order?->order_number ?? '#'.$invoice->order_id }} 
                             @endif
                         </div>
                     </td>
