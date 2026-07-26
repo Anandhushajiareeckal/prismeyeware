@@ -272,6 +272,7 @@
         $consolidated_subtotal = 0;
         $consolidated_tax = 0;
         $consolidated_discount = 0;
+        $consolidated_delivery = 0;
         $consolidated_total = 0;
         $consolidated_balance = 0;
         
@@ -279,6 +280,7 @@
             $consolidated_subtotal += $inv->subtotal;
             $consolidated_tax += $inv->tax_amount;
             $consolidated_discount += $inv->discount_amount;
+            $consolidated_delivery += $inv->delivery_charge ?? 0;
             $consolidated_total += $inv->total_amount;
             
             $bal = $inv->payment_status === 'Paid' ? 0 : floatval($inv->total_amount);
@@ -400,6 +402,12 @@
                         <tr>
                             <td>GST (Incl. 15%)</td>
                             <td>{{ number_format($consolidated_tax, 2) }}</td>
+                        </tr>
+                        @endif
+                        @if($consolidated_delivery > 0)
+                        <tr>
+                            <td>Delivery Charge</td>
+                            <td>{{ number_format($consolidated_delivery, 2) }}</td>
                         </tr>
                         @endif
                         <tr class="row-total">
