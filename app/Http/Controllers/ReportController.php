@@ -59,14 +59,18 @@ class ReportController extends Controller
             $query->where('payment_status', $request->status);
         }
 
+        $allInvoiceIds = (clone $query)->orderBy('invoice_date', 'desc')->pluck('id')->toArray();
         $invoices = $query->orderBy('invoice_date', 'desc')->paginate(20);
 
-        return view('reports.customer', compact('customer', 'invoices'));
+        return view('reports.customer', compact('customer', 'invoices', 'allInvoiceIds'));
     }
 
     public function printSelected(Request $request)
     {
         $invoiceIds = $request->input('invoices', []);
+        if (is_string($invoiceIds)) {
+            $invoiceIds = array_filter(explode(',', $invoiceIds));
+        }
         
         if (empty($invoiceIds)) {
             return back()->with('error', 'No invoices selected for printing.');
@@ -80,6 +84,9 @@ class ReportController extends Controller
     public function deleteSelected(Request $request)
     {
         $invoiceIds = $request->input('invoices', []);
+        if (is_string($invoiceIds)) {
+            $invoiceIds = array_filter(explode(',', $invoiceIds));
+        }
 
         if (empty($invoiceIds)) {
             return back()->with('error', 'No reports selected for deletion.');

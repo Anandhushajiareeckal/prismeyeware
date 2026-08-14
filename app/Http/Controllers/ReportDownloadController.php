@@ -47,6 +47,9 @@ class ReportDownloadController extends Controller
     public function downloadBulk(Request $request)
     {
         $invoiceIds = $request->input('invoices', []);
+        if (is_string($invoiceIds)) {
+            $invoiceIds = array_filter(explode(',', $invoiceIds));
+        }
 
         if (empty($invoiceIds)) {
             return back()->with('error', 'No invoices selected for download.');
