@@ -28,38 +28,39 @@
     .selection-counter-pill {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        background: #1a6cdb;
-        color: #ffffff;
+        gap: 8px;
+        background: #eef5ff;
+        color: #0d6efd;
         font-weight: 600;
         font-size: 13px;
-        padding: 5px 14px;
+        padding: 6px 16px;
         border-radius: 50rem;
-        box-shadow: 0 2px 8px rgba(26, 108, 219, 0.25);
+        border: 1px solid #cce0ff;
         animation: pillPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .selection-counter-pill .badge-context {
-        background: rgba(255, 255, 255, 0.22);
+        background: #0d6efd;
         color: #ffffff;
-        padding: 2px 8px;
+        padding: 3px 8px;
         border-radius: 12px;
-        font-size: 11px;
-        font-weight: 500;
+        font-size: 11.5px;
+        font-weight: 600;
     }
 
     /* Select all pages notification banner */
     .selection-banner-alert {
-        background: #ffffff;
-        border: 1px solid #b6d4fe;
+        background: #f8faff;
+        border: 1px dashed #a5c8ff;
         color: #084298;
         border-radius: 10px;
-        padding: 10px 18px;
-        font-size: 13.5px;
-        margin-top: 12px;
+        padding: 12px 20px;
+        font-size: 14px;
+        margin-top: 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        flex-wrap: wrap;
+        gap: 12px;
         animation: bannerSlideDown 0.25s ease-out;
     }
 
@@ -153,41 +154,41 @@
     {{-- ── Bulk Actions Bar ── --}}
     <div class="card-body border-bottom py-3 px-4 bulk-bar" id="bulk-bar">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="form-check me-1">
-                    <input class="form-check-input" type="checkbox" id="selectAll" style="cursor: pointer; width: 1.15em; height: 1.15em;">
-                    <label class="form-check-label fw-bold text-dark ms-1" for="selectAll" style="cursor: pointer;">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="form-check me-1 mb-0 d-flex align-items-center">
+                    <input class="form-check-input mt-0" type="checkbox" id="selectAll" style="cursor: pointer; width: 1.15em; height: 1.15em;">
+                    <label class="form-check-label fw-bold text-dark ms-2" for="selectAll" style="cursor: pointer;">
                         Select Page
                     </label>
                 </div>
 
                 {{-- Counter Pill --}}
                 <div id="selection-pill" class="selection-counter-pill" style="display: none;">
-                    <i class="bi bi-check2-circle"></i>
+                    <i class="bi bi-check2-circle fs-6"></i>
                     <span id="selected-count-text">0 selected</span>
-                    <span class="badge-context" id="selected-total-context">of {{ count($allInvoiceIds) }}</span>
+                    <span class="badge-context" id="selected-total-context"> of {{ count($allInvoiceIds) }}</span>
                 </div>
 
-                <button type="button" class="btn btn-link btn-sm p-0 text-danger text-decoration-none" id="btn-clear-selection" style="display: none; font-size: 13px;">
+                <button type="button" class="btn btn-link btn-sm p-0 text-danger text-decoration-none fw-medium" id="btn-clear-selection" style="display: none; font-size: 13px;">
                     <i class="bi bi-x-circle me-1"></i>Clear selection
                 </button>
             </div>
 
-            <div class="d-flex gap-2 align-items-center">
-                <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2 fw-medium shadow-sm d-flex align-items-center gap-1" id="btn-print-selected" disabled onclick="submitBulkAction('print')">
+            <div class="d-flex gap-2 align-items-center flex-wrap mt-1 mt-md-0">
+                <button type="button" class="btn btn-sm btn-primary px-3 rounded-2 fw-medium shadow-sm d-flex align-items-center gap-2" id="btn-print-selected" disabled onclick="submitBulkAction('print')">
                     <i class="bi bi-printer"></i>
-                    <span>Print Selected (A4)</span>
-                    <span class="badge bg-primary text-white ms-1 rounded-pill" id="badge-print-count" style="display:none;">0</span>
+                    <span>Print Selected</span>
+                    <span class="badge bg-white text-primary ms-1 rounded-pill px-2 py-1" id="badge-print-count" style="display:none; font-size: 11px;">0</span>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-success px-3 rounded-2 fw-medium shadow-sm d-flex align-items-center gap-1" id="btn-download-selected" disabled onclick="submitBulkAction('download')">
+                <button type="button" class="btn btn-sm btn-success px-3 rounded-2 fw-medium shadow-sm d-flex align-items-center gap-2" id="btn-download-selected" disabled onclick="submitBulkAction('download')">
                     <i class="bi bi-file-earmark-pdf"></i>
-                    <span>Download Selected (PDF)</span>
-                    <span class="badge bg-success text-white ms-1 rounded-pill" id="badge-download-count" style="display:none;">0</span>
+                    <span>Download PDF</span>
+                    <span class="badge bg-white text-success ms-1 rounded-pill px-2 py-1" id="badge-download-count" style="display:none; font-size: 11px;">0</span>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-danger px-3 rounded-2 fw-medium shadow-sm d-flex align-items-center gap-1" id="btn-delete-selected" disabled onclick="submitBulkAction('delete')">
+                <button type="button" class="btn btn-sm btn-outline-danger px-3 rounded-2 fw-medium d-flex align-items-center gap-2 bg-white" id="btn-delete-selected" disabled onclick="submitBulkAction('delete')">
                     <i class="bi bi-trash"></i>
-                    <span>Delete Selected</span>
-                    <span class="badge bg-danger text-white ms-1 rounded-pill" id="badge-delete-count" style="display:none;">0</span>
+                    <span>Delete</span>
+                    <span class="badge bg-danger text-white ms-1 rounded-pill px-2 py-1" id="badge-delete-count" style="display:none; font-size: 11px;">0</span>
                 </button>
             </div>
         </div>
@@ -195,11 +196,11 @@
         {{-- Banner Alert Strip for Select All Pages --}}
         <div id="selection-banner-alert" class="selection-banner-alert" style="display: none;">
             <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-info-circle-fill text-primary fs-6"></i>
+                <i class="bi bi-info-circle-fill text-primary fs-5"></i>
                 <span id="banner-text">All items on this page are selected.</span>
             </div>
-            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 py-1 fw-semibold shadow-sm" id="btn-select-all-pages">
-                Select all {{ count($allInvoiceIds) }} items in this report
+            <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 py-1 fw-semibold shadow-sm text-nowrap" id="btn-select-all-pages">
+                Select all {{ count($allInvoiceIds) }} items
             </button>
         </div>
     </div>

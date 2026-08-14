@@ -28,6 +28,7 @@
         .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
         .badge { font-weight: 500; padding: 0.5em 0.8em; border-radius: 6px; }
     </style>
+    @stack('styles')
 </head>
 <body>
     <div class="d-flex">
